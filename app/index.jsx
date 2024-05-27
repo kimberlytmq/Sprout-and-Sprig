@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "center",
+    alignItems: "center"
   },
   logo: {
     marginTop: 100,
@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontWeight: "bold",
     fontSize: 20,
+    color: "white"
   }
 
 });
