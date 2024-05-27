@@ -26,7 +26,7 @@ export default function Layout(){
           tabBarIcon: ({ focused })=>(
             <View style={{
               alignItems: "center",
-              paddingTop: 10
+              paddingTop: 20
             }}>
               <Ionicons
                 name={focused ? "home" : "home-outline"}
@@ -49,7 +49,7 @@ export default function Layout(){
           tabBarIcon: ({ focused })=>(
             <View style={{
               alignItems: "center",
-              paddingTop: 10
+              paddingTop: 20
             }}>
               <Ionicons
                 name={focused ? "search" : "search-outline"}
@@ -72,7 +72,7 @@ export default function Layout(){
           tabBarIcon: ({ focused })=>(
             <View style={{
               alignItems: "center",
-              paddingTop: 10
+              paddingTop: 20
             }}>
               <Ionicons
                 name={focused ? "camera" : "camera-outline"}
@@ -95,7 +95,7 @@ export default function Layout(){
           tabBarIcon: ({ focused })=>(
             <View style={{
               alignItems: "center",
-              paddingTop: 10
+              paddingTop: 20
             }}>
               <Ionicons
                 name={focused ? "book" : "book-outline"}
@@ -118,7 +118,7 @@ export default function Layout(){
           tabBarIcon: ({ focused })=>(
             <View style={{
               alignItems: "center",
-              paddingTop: 10
+              paddingTop: 20
             }}>
               <Ionicons
                 name={focused ? "location" : "location-outline"}
