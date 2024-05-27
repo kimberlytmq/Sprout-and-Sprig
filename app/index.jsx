@@ -1,9 +1,10 @@
 import { Text, View, StyleSheet, Image, TouchableOpacity, Button } from "react-native";
 import { Link, Redirect, router } from "expo-router";
 
+
 export default function Index() {
   return (
-    <View style={styles.container}>
+      <View style={styles.container}>
       <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
       <TouchableOpacity style={styles.button} onPress={() => router.push('/log-in')} >
         <Text style={styles.buttonText} >Continue with Email</Text>
@@ -12,6 +13,7 @@ export default function Index() {
       {/*using this just to see home and the tabs for now, can rm later*/}
       <Link href="/home" style={styles.container}>Go to Home</Link>
     </View>
+    
   );
 }
 
@@ -19,7 +21,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   logo: {
     marginTop: 100,
