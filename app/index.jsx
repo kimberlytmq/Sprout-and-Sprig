@@ -20,8 +20,11 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    marginTop: 80
+    
   },
   logo: {
     marginTop: 100,

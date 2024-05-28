@@ -44,7 +44,10 @@ const LogIn = () => {
       <View style={styles.logoContainer}>
       <Image source={require('../../assets/images/logo.png')} style={styles.logo}/>
       </View>
-      <Text style={styles.headerText}>Log in</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Log in</Text>
+      </View>
+
       <TextInput 
         value={email}
         style={styles.input}
@@ -52,6 +55,7 @@ const LogIn = () => {
         autoCapitalize="none"
         onChangeText={(text) => setEmail(text)}
       />
+      
 
       <TextInput 
         value={password}
@@ -87,15 +91,16 @@ export default LogIn
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 20,
+    //marginHorizontal: 20,
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: "#E9F7EF"
   },
   logoContainer: {
     position: 'absolute',
-    top: 0,
-    left: 75,
+    top: 40,
+    left: 100,
   },
   input: {
     marginVertical: 20,
@@ -104,7 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     backgroundColor: '#fff',
-    fontSize: 18
+    fontSize: 18,
+    width: 350
   },
   logo: {
     resizeMode: "contain",
@@ -115,7 +121,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 35,
     marginBottom: 20,
-    color: "#397004"
+    color: "#397004",
+    marginLeft: -100
   },
   button: {
     backgroundColor: "#145A32",
@@ -146,5 +153,10 @@ const styles = StyleSheet.create({
     color: "#397004",
     fontWeight: "bold",
     textDecorationLine: "underline"
+  },
+  headerContainer: {
+    position: "absolute",
+    left: 120,
+    top: 240
   }
 })
