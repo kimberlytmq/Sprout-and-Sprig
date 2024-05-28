@@ -91,7 +91,6 @@ export default LogIn
 
 const styles = StyleSheet.create({
   container: {
-    //marginHorizontal: 20,
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     position: 'absolute',
-    top: 40,
+    top: 30,
     left: 100,
   },
   input: {
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     fontSize: 18,
     width: 350,
-borderColor: 'white'
+    borderColor: 'white'
   },
   logo: {
     resizeMode: "contain",
@@ -123,7 +122,7 @@ borderColor: 'white'
     fontSize: 35,
     marginBottom: 20,
     color: "#397004",
-    marginLeft: -100
+    marginLeft: 0
   },
   button: {
     backgroundColor: "#397004",
@@ -155,9 +154,4 @@ borderColor: 'white'
     fontWeight: "bold",
     textDecorationLine: "underline"
   },
-  headerContainer: {
-    position: "absolute",
-    left: 120,
-    top: 240
-  }
 })

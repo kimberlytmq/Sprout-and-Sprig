@@ -31,7 +31,10 @@ const SignUp = () => {
       <View style={styles.logoContainer}>
       <Image source={require('../../assets/images/logo.png')} style={styles.logo}/>
       </View>
-      <Text style={styles.headerText}>Sign Up</Text>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerText}>Sign Up</Text>
+      </View>
+      
 
       <TextInput 
         value={username}
@@ -82,15 +85,14 @@ export default SignUp
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 20,
     flex: 1,
     justifyContent: 'center',
     backgroundColor: "#E9F7EF"
   },
   logoContainer: {
     position: 'absolute',
-    top: 0,
-    left: 75,
+    top: 30,
+    left: 100,
   },
   input: {
     marginVertical: 15,
@@ -100,7 +102,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: '#fff',
     fontSize: 18,
-    borderColor: 'white'
+    borderColor: 'white',
+    width: 350,
+    marginLeft: 20
   },
   logo: {
     resizeMode: "contain",
@@ -110,8 +114,9 @@ const styles = StyleSheet.create({
   headerText: {
     fontWeight: "bold",
     fontSize: 35,
-    marginBottom: 20,
-    color: "#397004"
+    marginBottom: 15,
+    color: "#397004",
+    marginLeft: 135
   },
   button: {
     backgroundColor: "#397004",
@@ -122,7 +127,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
     width: 350,
     marginBottom: 10,
-    marginTop: 20
+    marginTop: 20,
+    marginLeft: 20
   },
   buttonText: {
     fontWeight: "bold",
