@@ -11,7 +11,7 @@ export default function Index() {
       </TouchableOpacity>
       
       {/*using this just to see home and the tabs for now, can rm later*/}
-      <Link href="/home" style={styles.container}>Go to Home</Link>
+      <Link href="/search" style={styles.container}>Go to Search</Link>
     </View>
     
   );

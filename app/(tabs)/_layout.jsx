@@ -21,29 +21,6 @@ export default function Layout(){
       }
     }}>
       <Tabs.Screen
-        name="home"
-        options={{
-          tabBarIcon: ({ focused })=>(
-            <View style={{
-              alignItems: "center",
-              paddingTop: 20
-            }}>
-              <Ionicons
-                name={focused ? "home" : "home-outline"}
-                color={focused ? "#718355" : "black"}
-                size={24}
-              />
-              <Text style={{
-                color: focused ? "#718355" : "black",
-                fontSize: 12,
-                marginTop: 4
-              }}>Home</Text>
-            </View>
-          )
-        }}
-      />
-
-      <Tabs.Screen
         name="search"
         options={{
           tabBarIcon: ({ focused })=>(
@@ -61,29 +38,6 @@ export default function Layout(){
                 fontSize: 12,
                 marginTop: 4
               }}>Search</Text>
-            </View>
-          )
-        }}
-      />
-
-      <Tabs.Screen
-        name="camera"
-        options={{
-          tabBarIcon: ({ focused })=>(
-            <View style={{
-              alignItems: "center",
-              paddingTop: 20
-            }}>
-              <Ionicons
-                name={focused ? "camera" : "camera-outline"}
-                color={focused ? "#718355" : "black"}
-                size={24}
-              />
-              <Text style={{
-                color: focused ? "#718355" : "black",
-                fontSize: 12,
-                marginTop: 4
-              }}>Camera</Text>
             </View>
           )
         }}
@@ -113,6 +67,29 @@ export default function Layout(){
       />
 
       <Tabs.Screen
+        name="camera"
+        options={{
+          tabBarIcon: ({ focused })=>(
+            <View style={{
+              alignItems: "center",
+              paddingTop: 20
+            }}>
+              <Ionicons
+                name={focused ? "camera" : "camera-outline"}
+                color={focused ? "#718355" : "black"}
+                size={24}
+              />
+              <Text style={{
+                color: focused ? "#718355" : "black",
+                fontSize: 12,
+                marginTop: 4
+              }}>Camera</Text>
+            </View>
+          )
+        }}
+      />
+
+      <Tabs.Screen
         name="map"
         options={{
           tabBarIcon: ({ focused })=>(
@@ -130,6 +107,29 @@ export default function Layout(){
                 fontSize: 12,
                 marginTop: 4
               }}>Map</Text>
+            </View>
+          )
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ focused })=>(
+            <View style={{
+              alignItems: "center",
+              paddingTop: 20
+            }}>
+              <Ionicons
+                name={focused ? "person" : "person-outline"}
+                color={focused ? "#718355" : "black"}
+                size={24}
+              />
+              <Text style={{
+                color: focused ? "#718355" : "black",
+                fontSize: 12,
+                marginTop: 4
+              }}>Profile</Text>
             </View>
           )
         }}
