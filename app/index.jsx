@@ -11,7 +11,7 @@ export default function Index() {
       </TouchableOpacity>
       
       {/*using this just to see home and the tabs for now, can rm later*/}
-      <Link href="/search" style={styles.container}>Go to Search</Link>
+      <Link href="/search" style={styles.container}>Go to Main</Link>
     </View>
     
   );
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     alignSelf: "center"
   },
   button: {
-    backgroundColor: "#8fbc8f",
+    backgroundColor: "#397004",
     padding: 15,
     alignItems: "center",
     justifyContent: "center",

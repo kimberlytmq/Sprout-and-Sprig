@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
@@ -78,7 +78,6 @@ const LogIn = () => {
         )
       }
         
-        
     </View>
   )
 }
@@ -104,7 +103,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     padding: 10,
     backgroundColor: '#fff',
-    fontSize: 18
+    fontSize: 18,
+    borderColor: 'white'
   },
   logo: {
     resizeMode: "contain",
@@ -118,7 +118,7 @@ const styles = StyleSheet.create({
     color: "#397004"
   },
   button: {
-    backgroundColor: "#145A32",
+    backgroundColor: "#397004",
     padding: 15,
     alignItems: "center",
     justifyContent: "center",
