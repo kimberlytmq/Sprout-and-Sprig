@@ -44,7 +44,7 @@ export default function Layout(){
       />
 
       <Tabs.Screen
-        name="index"
+        name="biodex"
         options={{
           tabBarIcon: ({ focused })=>(
             <View style={{
@@ -60,7 +60,7 @@ export default function Layout(){
                 color: focused ? "#718355" : "black",
                 fontSize: 12,
                 marginTop: 4
-              }}>Index</Text>
+              }}>Biodex</Text>
             </View>
           )
         }}

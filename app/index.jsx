@@ -17,8 +17,8 @@ function OnboardingScreen() {
       <Text style={styles.buttonText} >Continue with Email</Text>
     </TouchableOpacity>
     
-    {/*using this just to see home and the tabs for now, can rm later
-    <Link href="/search" style={styles.container}>Go to Main</Link> */}
+    {/*using this just to see home and the tabs for now, can rm later*/}
+    <Link href="/search" style={styles.buttonText}>Go to Main</Link> 
   </View>
   
 );

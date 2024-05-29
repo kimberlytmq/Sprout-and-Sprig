@@ -1,12 +1,12 @@
 import { View, Text } from 'react-native'
 import React from 'react'
 
-const Index = () => {
+const Biodex = () => {
   return (
     <View>
-      <Text>Index</Text>
+      <Text>Biodex</Text>
     </View>
   )
 }
 
-export default Index
+export default Biodex

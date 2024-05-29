@@ -67,13 +67,12 @@ const LogIn = () => {
           placeholder='Password'
           autoCapitalize='none'
           onChangeText={(text) => setPassword(text)}
-          secureTextEntry={showPassword}
+          secureTextEntry={!showPassword}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         />
         <TouchableOpacity style={styles.eyeIcon}
-          onPressIn={() => setShowPassword(false)}
-          onPressOut={() => setShowPassword(true)}
+          onPress={() => setShowPassword(!showPassword)}
         >
           <Ionicons
             name={showPassword ? "eye-off" : "eye"}
