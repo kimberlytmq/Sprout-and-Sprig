@@ -1,9 +1,11 @@
 import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FIREBASE_AUTH } from '../../FirebaseConfig';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { Link, Redirect, router } from "expo-router";
+import { useNavigation } from '@react-navigation/core';
+import Search from '../(tabs)/search';
 
 const LogIn = () => {
   const [email, setEmail] = useState('');
@@ -25,19 +27,17 @@ const LogIn = () => {
     }
   }
 
-  // const signUp = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const response = await createUserWithEmailAndPassword(auth, email, password);
-  //     console.log(response);
-  //     alert('Check your email!');
-  //   } catch(error) {
-  //     console.log(error);
-  //     alert('Log in failed ' + error.message);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
+  // const navigation = useNavigation();
+
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged(user => {
+  //     if (user) {
+  //       navigation.navigate("Search")
+  //     }
+  //   })
+
+  //   return unsubscribe;
+  // }, [])
   
   return (
     <View style={styles.container}>
@@ -75,7 +75,6 @@ const LogIn = () => {
             <View style={styles.signUpContainer}>
               <Text style={styles.smallText}>Don't have an account? </Text>
               <Link href="/sign-up" style={styles.smallButton}>Sign up</Link>
-              {/* <Button title="Sign up" onPress={signUp}/> */}
             </View>
             
           </>
