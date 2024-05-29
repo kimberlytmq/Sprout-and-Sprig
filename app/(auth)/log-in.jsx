@@ -6,11 +6,15 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { Link, Redirect, router } from "expo-router";
 import { useNavigation } from '@react-navigation/core';
 import Search from '../(tabs)/search';
+import { Ionicons } from "@expo/vector-icons";
+import { RotateInDownLeft } from 'react-native-reanimated';
 
 const LogIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [focused, setFocused] = useState(false);
   const auth = FIREBASE_AUTH;
 
   const signIn = async () => {
@@ -56,15 +60,28 @@ const LogIn = () => {
         onChangeText={(text) => setEmail(text)}
       />
       
-
-      <TextInput 
-        value={password}
-        style={styles.input}
-        placeholder='Password'
-        autoCapitalize='none'
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry={true}
-      />
+      <View style={styles.inputContainer}>
+        <TextInput 
+          value={password}
+          style={styles.input}
+          placeholder='Password'
+          autoCapitalize='none'
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry={showPassword}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+        />
+        <TouchableOpacity style={styles.eyeIcon}
+          onPressIn={() => setShowPassword(false)}
+          onPressOut={() => setShowPassword(true)}
+        >
+          <Ionicons
+            name={showPassword ? "eye-off" : "eye"}
+            color={"#C7C7CD"}
+            size={24}
+          />
+        </TouchableOpacity>
+      </View>
       
       { loading ? (<ActivityIndicator size="large" color="#0000ff"/> 
         ) : (
@@ -153,4 +170,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textDecorationLine: "underline"
   },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 32
+  }
 })
