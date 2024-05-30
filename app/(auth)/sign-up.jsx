@@ -17,7 +17,8 @@ const SignUp = () => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password);
       console.log(response);
-      alert('Check your email!');
+      alert('You can log in now!');
+      router.replace('/log-in');
     } catch(error) {
       console.log(error);
       alert('Log in failed ' + error.message);
