@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, Image, TouchableOpacity, Button } from "react-native";
+import { Text, View, StyleSheet, Image, TouchableOpacity, Button, ActivityIndicator } from "react-native";
 import { Link, Redirect, router, Tabs } from "expo-router";
 import { useState, useEffect } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
@@ -55,7 +55,7 @@ function authStack() {
 }
 
 
-export default function Index() {
+export default function StartPage() {
   // const [user, setUser] = useState(null);
 
   // useEffect(() => {
@@ -76,8 +76,15 @@ export default function Index() {
   //     </NavigationContainer>
     
   // );
-  const { user } = useAuth();
-  return user ? <userStack /> : <authStack />
+  // const { user } = useAuth();
+  // return user ? <userStack /> : <authStack />
+
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator style={styles.loading}/>
+    </View>
+  )
+ 
 }
 
 const styles = StyleSheet.create({
@@ -111,6 +118,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 20,
     color: "white"
+  },
+  loading: {
+    color: "gray",
   }
 
 });
