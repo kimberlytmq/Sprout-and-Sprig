@@ -6,30 +6,6 @@ import { Link, Redirect, router } from "expo-router";
 import CustomKeyboardView from '../context/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 
-/*
-const SignUp = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  const signUp = async () => {
-    setLoading(true);
-    try {
-      const response = await createUserWithEmailAndPassword(auth, email, password);
-      console.log(response);
-      alert('You can log in now!');
-      router.replace('/log-in');
-    } catch(error) {
-      console.log(error);
-      alert('Log in failed ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  */
-
 export default function SignUp() {
   const {signup} = useAuth();
   const [loading, setLoading] = useState(false);

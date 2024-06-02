@@ -8,28 +8,6 @@ import { Ionicons } from "@expo/vector-icons";
 import CustomKeyboardView from '../context/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 
-/*
-const LogIn = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [focused, setFocused] = useState(false);
-
-  const signIn = async () => {
-    setLoading(true);
-    try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
-      console.log(response);
-      alert('Check your email!');
-    } catch(error) {
-      console.log(error);
-      alert('Log in failed ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  }
-  */
 
 export default function LogIn() {
   const [loading, setLoading] = useState(false);
