@@ -36,7 +36,7 @@ export const AuthContextProvider = ({children}) => {
 
   const logout = async (email, password) => {
     try {
-      await signOut(auth);
+      await signOut(auth)
       return {success: true}
 
     } catch(e) {
