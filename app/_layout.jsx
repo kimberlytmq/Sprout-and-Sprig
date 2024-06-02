@@ -1,11 +1,33 @@
-import { Stack } from "expo-router";
+import { Slot, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
+import { AuthContextProvider, useAuth } from "../context/authContext";
+
+const MainLayout = ()=>{
+  const {isAuthenticated} = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+
+  
+  useEffect(()=>{
+    //check if user is authenticated or not
+    if(typeof isAuthenticated=='undefined') return;
+    const inApp = segments[0]=='(tabs)';
+    if(isAuthenticated && !inApp) {
+      // redirect to search
+      router.replace('search');
+    } else if(isAuthenticated==false) {
+      // redirect to signIn
+      router.replace('log-in');
+    }
+  }, [isAuthenticated])
+
+  return <Slot/>
+}
 
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="index" options={{headerShown: false}}/>
-      <Stack.Screen name="(auth)" options={{headerShown: false}}/>
-      <Stack.Screen name="(tabs)" options={{headerShown: false}}/>
-    </Stack>
+    <AuthContextProvider>
+      <MainLayout/>
+    </AuthContextProvider>
   );
 }

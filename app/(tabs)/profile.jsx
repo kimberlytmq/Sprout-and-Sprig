@@ -1,11 +1,9 @@
 import { View, Text, StyleSheet } from 'react-native'
 import React from 'react'
-import { FIREBASE_AUTH } from '../../FirebaseConfig'
-import { useNavigation } from '@react-navigation/native'
 
 const Profile = () => {
   return (
-    <View>
+    <View style={styles.container}>
       <Text>Profile</Text>
     </View>
   )
@@ -13,3 +11,11 @@ const Profile = () => {
 
 
 export default Profile
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1
+  }
+});
