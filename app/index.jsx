@@ -7,8 +7,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Search from "./(tabs)/search";
 import LogIn from "./(auth)/log-in";
-import SignUp from "./(auth)/sign-up";
-import { useAuth } from '../hooks/useAuth'
 
 
 function OnboardingScreen() {
@@ -28,56 +26,38 @@ function OnboardingScreen() {
 
 const Stack = createNativeStackNavigator();
 
-const otherStack = createNativeStackNavigator();
+const InsideStack = createNativeStackNavigator();
 
-function userStack() {
+function InsideLayout() {
    return (
-    <NavigationContainer>
-      <otherStack.Navigator>
-      <otherStack.Screen name="Search" component={Search}/>
-    </otherStack.Navigator>
-    </NavigationContainer>
-    
+    <InsideStack.Navigator>
+      <InsideStack.Screen name="Search" component={Search}/>
+    </InsideStack.Navigator>
    );
-}
-
-function authStack() {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="onboarding" component={OnboardingScreen} />
-        <Stack.Screen name="login" component={LogIn} />
-        <Stack.Screen name="signup" component={SignUp} />
-        
-      </Stack.Navigator>
-    </NavigationContainer>
-  )
 }
 
 
 export default function Index() {
-  // const [user, setUser] = useState(null);
+  const [user, setUser] = useState(null);
 
-  // useEffect(() => {
-  //   onAuthStateChanged(FIREBASE_AUTH, (user) => {
-  //     console.log('user', user);
-  //     setUser(user);
-  //   })
-  // }, [])
-  // return (
-  //     <NavigationContainer independent={true}>
-  //       <Stack.Navigator>
-  //         {user ? (<Stack.Screen name="Search" component={Search} options={{headerShown: false}} />)
-  //               : (<Stack.Screen name="OnboardingScreen" component={OnboardingScreen} /* can replace this with OnboardingScreen to get onboarding screen*/ 
-  //                   options={{headerShown: false}} />)
-  //         }
+  useEffect(() => {
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      console.log('user', user);
+      setUser(user);
+    })
+  }, [])
+  return (
+      <NavigationContainer independent={true}>
+        <Stack.Navigator>
+          {user ? (<Stack.Screen name="Search" component={Search} options={{headerShown: false}} />)
+                : (<Stack.Screen name="OnboardingScreen" component={OnboardingScreen} /* can replace this with OnboardingScreen to get onboarding screen*/ 
+                    options={{headerShown: false}} />)
+          }
         
-  //       </Stack.Navigator>
-  //     </NavigationContainer>
+        </Stack.Navigator>
+      </NavigationContainer>
     
-  // );
-  const { user } = useAuth();
-  return user ? <userStack /> : <authStack />
+  );
 }
 
 const styles = StyleSheet.create({
