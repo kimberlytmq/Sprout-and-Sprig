@@ -1,16 +1,17 @@
-import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity, Alert } from 'react-native';
 import React from 'react';
-import { useState } from 'react';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { useState, useRef } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { Link, Redirect, router } from "expo-router";
+import CustomKeyboardView from '../context/CustomKeyboardView';
+import { useAuth } from '../context/authContext';
 
+/*
 const SignUp = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
-  const auth = FIREBASE_AUTH;
 
   const signUp = async () => {
     setLoading(true);
@@ -27,10 +28,36 @@ const SignUp = () => {
     }
   }
 
+  */
+
+export default function SignUp() {
+  const {signup} = useAuth();
+  const [loading, setLoading] = useState(false);
+
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
+  const usernameRef = useRef("");
+
+  const handleSignUp = async ()=>{
+    if(!emailRef.current || !passwordRef.current || !usernameRef.current) {
+      Alert.alert('Sign up', "Please fill all the fields!")
+      return;
+    }
+    setLoading(true);
+
+    let response = await signup(usernameRef.current, emailRef.current, passwordRef.current)
+    setLoading(false);
+
+    console.log('got result: ', response);
+    if(!response.success) {
+      Alert.alert('Sign Up', response.msg);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-      <Image source={require('../../assets/images/logo.png')} style={styles.logo}/>
+      <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
       </View>
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Sign Up</Text>
@@ -38,51 +65,47 @@ const SignUp = () => {
       
 
       <TextInput 
-        value={username}
         style={styles.input}
         placeholder='Username'
         autoCapitalize="none"
-        onChangeText={(text) => setUsername(text)}
+        onChangeText={text => usernameRef.current=text}
       />
 
       <TextInput 
-        value={email}
         style={styles.input}
         placeholder='Email'
         autoCapitalize="none"
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={text => emailRef.current=text}
       />
 
       <TextInput 
-        value={password}
         style={styles.input}
         placeholder='Password'
         autoCapitalize='none'
-        onChangeText={(text) => setPassword(text)}
+        onChangeText={text => passwordRef.current=text}
         secureTextEntry={true}
       />
       
       { loading ? (<ActivityIndicator size="large" color="#0000ff"/> 
         ) : (
           <>
-            <TouchableOpacity style={styles.button} onPress={signUp} >
+            <TouchableOpacity style={styles.button} onPress={handleSignUp} >
               <Text style={styles.buttonText} >Sign Up</Text>
-            </TouchableOpacity>
-            <View style={styles.signUpContainer}>
-              <Text style={styles.smallText}>Already have an account? </Text>
-              <Link href="/log-in" style={styles.smallButton}>Log in</Link>
-              {/* <Button title="Sign up" onPress={signUp}/> */}
-            </View>
-            
+            </TouchableOpacity>       
           </>
         )
       }
+
+      <View style={styles.signUpContainer}>
+        <Text style={styles.smallText}>Already have an account? </Text>
+        <Link href="log-in" style={styles.smallButton}>Log in</Link>
+              {/* <Button title="Sign up" onPress={signUp}/> */}
+      </View>
         
     </View>
   )
 }
 
-export default SignUp
 
 const styles = StyleSheet.create({
   container: {

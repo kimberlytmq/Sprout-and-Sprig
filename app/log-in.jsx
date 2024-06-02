@@ -1,21 +1,20 @@
-import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity} from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity, Alert } from 'react-native';
 import React from 'react';
-import { useEffect, useState } from 'react';
-import { FIREBASE_AUTH } from '../../FirebaseConfig';
+import { useEffect, useState, useRef } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { Link, Redirect, router } from "expo-router";
-import { useNavigation } from '@react-navigation/core';
-import Search from '../(tabs)/search';
+import Search from './(tabs)/search';
 import { Ionicons } from "@expo/vector-icons";
-import { RotateInDownLeft } from 'react-native-reanimated';
+import CustomKeyboardView from '../context/CustomKeyboardView';
+import { useAuth } from '../context/authContext';
 
+/*
 const LogIn = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(false);
-  const auth = FIREBASE_AUTH;
 
   const signIn = async () => {
     setLoading(true);
@@ -30,43 +29,58 @@ const LogIn = () => {
       setLoading(false);
     }
   }
+  */
 
-  // const navigation = useNavigation();
+export default function LogIn() {
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [focused, setFocused] = useState(false);
 
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged(user => {
-  //     if (user) {
-  //       navigation.navigate("Search")
-  //     }
-  //   })
 
-  //   return unsubscribe;
-  // }, [])
+  const {login} = useAuth();
+
+  const emailRef = useRef("");
+  const passwordRef = useRef("");
+
+  const handleLogin = async () =>{
+    if(!emailRef.current || !passwordRef.current) {
+      Alert.alert('Log in', "Log in failed.");
+      return
+    }
+
+    setLoading(true)
+    const response = await login(emailRef.current, passwordRef.current);
+    setLoading(false)
+    if(!response.success) {
+      Alert.alert('Log In', response.msg);
+    }
+
+  }
   
   return (
+    
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-      <Image source={require('../../assets/images/logo.png')} style={styles.logo}/>
+      <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
       </View>
+
       <View style={styles.headerContainer}>
         <Text style={styles.headerText}>Log in</Text>
       </View>
 
       <TextInput 
-        value={email}
         style={styles.input}
         placeholder='Email'
         autoCapitalize="none"
-        onChangeText={(text) => setEmail(text)}
+        onChangeText={(text) => emailRef.current=text}
       />
       
       <View style={styles.inputContainer}>
         <TextInput 
-          value={password}
           style={styles.input}
           placeholder='Password'
           autoCapitalize='none'
-          onChangeText={(text) => setPassword(text)}
+          onChangeText={(text) => passwordRef.current=text}
           secureTextEntry={!showPassword}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
@@ -85,31 +99,30 @@ const LogIn = () => {
       { loading ? (<ActivityIndicator size="large" color="#0000ff"/> 
         ) : (
           <>
-            <TouchableOpacity style={styles.button} onPress={signIn} >
-              <Text style={styles.buttonText} >Log in</Text>
-            </TouchableOpacity>
-            <View style={styles.signUpContainer}>
-              <Text style={styles.smallText}>Don't have an account? </Text>
-              <Link href="/sign-up" style={styles.smallButton}>Sign up</Link>
-            </View>
-            
+          <TouchableOpacity style={styles.button} onPress={handleLogin} >
+            <Text style={styles.buttonText} >Log in</Text>
+          </TouchableOpacity>
           </>
         )
       }
-        
+     
+      <View style={styles.signUpContainer}>
+        <Text style={styles.smallText}>Don't have an account? </Text>
+        <Link href="sign-up" style={styles.smallButton}>Sign up</Link>
+      </View>
         
     </View>
+    
   )
 }
 
-export default LogIn
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: "#E9F7EF"
+    backgroundColor: "#E9F7EF",
   },
   logoContainer: {
     position: 'absolute',

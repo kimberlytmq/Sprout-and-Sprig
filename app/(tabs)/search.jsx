@@ -1,12 +1,17 @@
 import { View, Text, Button, StyleSheet } from 'react-native'
 import React from 'react'
-import { FIREBASE_AUTH} from '../../FirebaseConfig'; 
+import { useAuth } from '../../context/authContext';
 
 const Search = ({ navigation }) => {
+  const { logout } = useAuth();
+  const handleLogout = async ()=>{
+    await logout();
+  }
+
   return (
     <View style={styles.container}>
       <Text>Search</Text>
-      <Button onPress={() => FIREBASE_AUTH.signOut()} title="Logout" />
+      <Button onPress={handleLogout} title="Logout" />
     </View>
   )
 }
