@@ -44,7 +44,7 @@ export const AuthContextProvider = ({children}) => {
     }
   }
 
-  const signup = async (email, password, username) => {
+  const signup = async (username, email, password) => {
     try {
       const response = await createUserWithEmailAndPassword(auth, email, password);
       console.log('response.user: ', response?.user);
