@@ -87,12 +87,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    backgroundColor: "#E9F7EF"
+    backgroundColor: "#E9F7EF",
+    alignItems: 'center'
   },
   logoContainer: {
-    position: 'absolute',
-    top: 30,
-    left: 100,
+    top: 0,
+    left: 0,
   },
   input: {
     marginVertical: 15,
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     borderColor: 'white',
     width: 350,
-    marginLeft: 20
+    marginLeft: 0
   },
   logo: {
     resizeMode: "contain",
@@ -116,7 +116,6 @@ const styles = StyleSheet.create({
     fontSize: 35,
     marginBottom: 15,
     color: "#397004",
-    marginLeft: 135
   },
   button: {
     backgroundColor: "#397004",
@@ -128,7 +127,6 @@ const styles = StyleSheet.create({
     width: 350,
     marginBottom: 10,
     marginTop: 20,
-    marginLeft: 20
   },
   buttonText: {
     fontWeight: "bold",

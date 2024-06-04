@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity, Alert, KeyboardAvoidingView } from 'react-native';
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
@@ -37,7 +37,7 @@ export default function LogIn() {
   
   return (
     
-    <View style={styles.container}>
+    <KeyboardAvoidingView style={styles.container}>
       <View style={styles.logoContainer}>
       <Image source={require('../assets/images/logo.png')} style={styles.logo}/>
       </View>
@@ -89,7 +89,7 @@ export default function LogIn() {
         <Link href="sign-up" style={styles.smallButton}>Sign up</Link>
       </View>
         
-    </View>
+    </KeyboardAvoidingView>
     
   )
 }
@@ -103,9 +103,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#E9F7EF",
   },
   logoContainer: {
-    position: 'absolute',
-    top: 30,
-    left: 100,
+    top: 0,
+    left: 0,
   },
   input: {
     marginVertical: 20,
