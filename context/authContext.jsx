@@ -1,4 +1,4 @@
-import { createContext, useState, useContext, useEffect } from "react";
+import { createContext, useState, useContext, useEffect, userId } from "react";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { auth, db } from "../FirebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore";
@@ -15,6 +15,7 @@ export const AuthContextProvider = ({children}) => {
     const unsub = onAuthStateChanged(auth, (user)=>{
       if(user) {
         setisAuthenticated(true);
+        setUser(user);
       } else {
         setisAuthenticated(false);
         setUser(null);
