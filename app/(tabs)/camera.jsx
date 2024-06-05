@@ -1,20 +1,30 @@
-import { View, Text, StyleSheet } from 'react-native'
-import React from 'react'
+import { View, Text } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { Stack } from 'expo-router'
+import { Camera, CameraType } from 'expo-camera'
+import * as MediaLibrary from 'expo-media-library'
 
-const Camera = () => {
+export default function CameraScreen() {
+  const [hasCameraPermission, setHasCameraPermission] = useState(null)
+  const [image, setImage] = useState(null)
+  const [type, setType] = useState(Camera.Constants.Type.back)
+  const [flash, setFlash] = useState(Camera.Constants.FlashMode.off)
+  const cameraRef = useRef(null)
+
+  useEffect(() => {
+    (async () => {
+      MediaLibrary.requestPermissionsAsync()
+      const cameraStatus = await Camera.requestCameraPermissionsAsync()
+      setHasCameraPermission(cameraStatus.status === 'granted')
+    })()
+  }, [])
+
   return (
-    <View style={styles.container}>
-      <Text>Camera</Text>
+    <View>
+      <Text>camera</Text>
     </View>
   )
 }
 
-export default Camera
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1
-  }
-});
+const styles = StyleSheet.create({})
