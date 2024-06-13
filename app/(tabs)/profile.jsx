@@ -1,10 +1,13 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Link } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { db } from '../../FirebaseConfig'
 import { doc, getDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../context/authContext';
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from '@react-navigation/native';
+import EditProfile from '../editProfile';
 
 
 
@@ -12,6 +15,7 @@ const Profile = () => {
   const [username, setUsername] = useState('');
   const auth = getAuth();
   const user = auth.currentUser;
+  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -43,7 +47,23 @@ const Profile = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Hi, {username}!</Text>
+        <Image 
+          source={{ uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' }}
+          style={styles.profile}
+        />
+        <Text style={styles.title}>{username}</Text>
+        <View style={styles.emailContainer}>
+          <Ionicons 
+           name={"mail-outline"}
+           color={"#FFF"}
+           size={20}
+           />
+           <Text style={styles.email}>ameliachowhl204@gmail.com</Text>
+        </View>
+        <TouchableOpacity style={styles.editProfileButton} >
+            <Text style={styles.editProfileText}>Edit profile</Text>
+        </TouchableOpacity>
+        
       </View>
       <Text style={styles.subtitle}>Achievements</Text>
       <Text style={styles.subtitle}>Photos</Text>
@@ -65,16 +85,17 @@ const styles = StyleSheet.create({
 
   },
   header: {
-    height: 150,
+    height: 300,
     paddingTop: 50,
     backgroundColor: '#397004',
     justifyContent: 'center',
-    alignItems : 'center'
+    alignItems : 'center',
   },
   title: {
     fontWeight: "bold",
     fontSize: 35,
     color: "white",
+    marginBottom: 5
   },
   subtitle: {
     fontWeight: "bold",
@@ -99,5 +120,33 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: 18,
     color: "white"
+  },
+  profile: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    marginBottom: 10,
+  },
+  emailContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 10
+  },
+  email: {
+    color: "#FFF",
+    fontSize: 15,
+    marginLeft: 5
+  },
+  editProfileButton: {
+    backgroundColor: "#D4EFDF",
+    padding: 10,
+    borderRadius: 15,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  editProfileText: {
+    color: "#397004",
+    fontWeight: 'bold'
   }
 });

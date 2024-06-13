@@ -5,6 +5,9 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'fire
 import { Link, Redirect, router } from "expo-router";
 import CustomKeyboardView from '../context/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
+import { Ionicons } from "@expo/vector-icons";
+import UserPermissions from '../utilities/UserPermissions';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function SignUp() {
   const {signup} = useAuth();
@@ -91,7 +94,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   logoContainer: {
-    top: 0,
+    top: -50,
     left: 0,
   },
   input: {
@@ -114,6 +117,7 @@ const styles = StyleSheet.create({
   headerText: {
     fontWeight: "bold",
     fontSize: 35,
+    marginTop: -70,
     marginBottom: 15,
     color: "#397004",
   },
@@ -146,7 +150,7 @@ const styles = StyleSheet.create({
     color: "#397004",
     fontWeight: "bold",
     textDecorationLine: "underline"
-  }
+  },
 })
   
 

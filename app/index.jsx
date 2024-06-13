@@ -21,6 +21,39 @@ function OnboardingScreen() {
 
 export default OnboardingScreen;
 
+// import * as React from 'react';
+// import {NavigationContainer} from '@react-navigation/native';
+// import {createNativeStackNavigator} from '@react-navigation/native-stack';
+// import { createDrawerNavigator } from '@react-navigation/drawer';
+// import Profile from "./(tabs)/profile";
+// import EditProfile from "./editProfile";
+// //import Navigation from "./navigation";
+
+// const Stack = createNativeStackNavigator();
+
+
+// const ProfileStack = () => {
+//   return (
+//       <Stack.Navigator screenOptions={{
+//         headerShown: true
+//       }} >
+//         <Stack.Screen name="Profile"component={Profile}/>
+//         <Stack.Screen name="EditProfile" component={EditProfile} />
+//       </Stack.Navigator>
+//   );
+// };
+
+// const App = () => {
+//   return (
+//     <NavigationContainer>
+//       <ProfileStack />
+//     </NavigationContainer>
+       
+//   );
+// };
+
+// export default App;
+
 const styles = StyleSheet.create({
   container: {
     flexDirection: "column",
