@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Link } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, Link, ImageBackground } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { db } from '../../FirebaseConfig'
 import { doc, getDoc } from 'firebase/firestore';
@@ -8,14 +8,32 @@ import { useAuth } from '../../context/authContext';
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
 import EditProfile from '../editProfile';
-
+import * as ImagePicker from "expo-image-picker";
 
 
 const Profile = () => {
   const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const auth = getAuth();
   const user = auth.currentUser;
   const navigation = useNavigation();
+
+  const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
+
+  const handleImageSelection = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 4],
+      quality: 1
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setSelectedImage(result.assets[0].uri);
+    }
+  };
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -37,6 +55,26 @@ const Profile = () => {
     fetchUsername();
   }, [user]);
 
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setEmail(docSnap.data().email);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchEmail();
+  }, [user]);
+
 
   const { logout } = useAuth();
   const handleLogout = async ()=>{
@@ -47,10 +85,24 @@ const Profile = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image 
-          source={{ uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' }}
-          style={styles.profile}
-        />
+        <TouchableOpacity onPress={handleImageSelection}>
+            <Image
+            source={{ uri: selectedImage }}
+            style={styles.profile} 
+            />
+
+            <View style={styles.cameraContainer}>
+              <Ionicons 
+              name={'camera'}
+              color={'#fff'}
+              size={30}
+              style={styles.camera}
+              opacity={0.8}
+              />
+              </View>
+
+         
+        </TouchableOpacity>
         <Text style={styles.title}>{username}</Text>
         <View style={styles.emailContainer}>
           <Ionicons 
@@ -148,5 +200,10 @@ const styles = StyleSheet.create({
   editProfileText: {
     color: "#397004",
     fontWeight: 'bold'
-  }
+  },
+  cameraContainer: {
+    position: 'absolute',
+    marginTop: 80,
+    marginLeft: 70
+  },
 });

@@ -6,8 +6,7 @@ import { Link, Redirect, router } from "expo-router";
 import CustomKeyboardView from '../context/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
 import { Ionicons } from "@expo/vector-icons";
-import UserPermissions from '../utilities/UserPermissions';
-import * as ImagePicker from 'expo-image-picker';
+
 
 export default function SignUp() {
   const {signup} = useAuth();
