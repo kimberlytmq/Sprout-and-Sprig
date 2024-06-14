@@ -110,7 +110,7 @@ const Profile = () => {
            color={"#FFF"}
            size={20}
            />
-           <Text style={styles.email}>ameliachowhl204@gmail.com</Text>
+           <Text style={styles.email}>{email}</Text>
         </View>
         <TouchableOpacity style={styles.editProfileButton} >
             <Text style={styles.editProfileText}>Edit profile</Text>
