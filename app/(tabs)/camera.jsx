@@ -1,48 +1,93 @@
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View, useRef } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 
 
 export default function Camera() {
  const [facing, setFacing] = useState('back');
- const [permission, requestPermission] = useCameraPermissions();
+ const [cameraPermission, requestCameraPermission] = useCameraPermissions();
+ const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
  const [image, setImage] = useState(null);
+ const [flash, setFlash] = useState('off');
 
- if (!permission) {
+ if (!cameraPermission) {
    // Camera permissions are still loading.
    return <View />;
  }
 
 
- if (!permission.granted) {
+ if (!cameraPermission.granted) {
    // Camera permissions are not granted yet.
    return (
      
      <View style={styles.permissionContainer}>
        <Text style={styles.permission}>Allow access to camera?</Text>
-       <TouchableOpacity style={styles.permissionButton} onPress={requestPermission}>
+       <TouchableOpacity style={styles.permissionButton} onPress={requestCameraPermission}>
          <Text style={styles.permissionText}>Grant Camera Permission</Text>
        </TouchableOpacity>
      </View>
    );
  }
 
-
- function toggleCameraFacing() {
-   setFacing(current => (current === 'back' ? 'front' : 'back'));
+ if (!mediaLibraryPermission) {
+  // Media Library permissions are still loading.
+  return <View />
  }
+
+ if (!mediaLibraryPermission.granted) {
+  // Media Library permissions are not granted yet. 
+  <View style={styles.permissionContainer}>
+       <Text style={styles.permission}>Allow access to media library?</Text>
+       <TouchableOpacity style={styles.permissionButton} onPress={requestMediaLibraryPermission}>
+         <Text style={styles.permissionText}>Grant Media Library Permission</Text>
+       </TouchableOpacity>
+     </View>
+ }
+
+
+ const toggleCameraFacing = () => {
+   setFacing(
+    current => (current === 'back' ? 'front' : 'back')
+    );
+ }
+
+ const toggleFlash = () => {
+  setFlash(
+    current => (current === Camera.Constants.FlashMode.off ? Camera.Constants.FlashMode.on : Camera.Constants.FlashMode.off)
+  )
+ }
+
+ const takePicture = async () => {
+  if (cameraRef.current) {
+    const photo = await cameraRef.current.takePictureAsync();
+    setImage(photo.uri);
+    await MediaLibrary.createAssetAsync(photo.uri);
+  }
+ }
+ 
 
 
  return (
    <View style={styles.container}>
-     <CameraView style={styles.camera} facing={facing}>
+     <Camera style={styles.camera} facing={facing} flashMide={flash} ref={cameraRef}> 
        <View style={styles.buttonContainer}>
          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-           <Text style={styles.text}>Flip Camera</Text>
+           <Text style={styles.text}>Flip</Text>
          </TouchableOpacity>
+         <TouchableOpacity style={styles.button} onPress={toggleFlash}>
+            <Text style={styles.text}>Flash</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={takePicture}>
+            <Text style={styles.text}>Capture</Text>
+          </TouchableOpacity>
        </View>
-     </CameraView>
+     </Camera>
+     {image && (
+        <View>
+          <Image source={{ uri: image }} style={styles.image}/>
+        </View>
+     )}
    </View>
  );
 }
@@ -86,6 +131,7 @@ const styles = StyleSheet.create({
  buttonContainer: {
    flex: 1,
    flexDirection: 'row',
+   justifyContent: 'space-around',
    backgroundColor: 'transparent',
    margin: 64,
  },
@@ -98,5 +144,14 @@ const styles = StyleSheet.create({
    fontSize: 24,
    fontWeight: 'bold',
    color: 'white',
- }
+ },
+ imagePreview: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  image: {
+    width: '100%',
+    height: '100%',
+  },
 });
