@@ -8,7 +8,7 @@ const Search = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Welcome Back!</Text>
+        <Text style={styles.headerText}>Explore!</Text>
       </View>
       <View style={styles.searchContainer}>
         <Ionicons
