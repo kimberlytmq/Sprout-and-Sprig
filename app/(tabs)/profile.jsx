@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, Link, ImageBackground } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
+import { Link } from "expo-router";
 import React, { useEffect, useState } from 'react'
 import { db } from '../../FirebaseConfig'
 import { doc, getDoc } from 'firebase/firestore';
@@ -112,9 +113,12 @@ const Profile = () => {
            />
            <Text style={styles.email}>{email}</Text>
         </View>
-        <TouchableOpacity style={styles.editProfileButton} >
+        <Link href="/editProfile" asChild>
+          <TouchableOpacity style={styles.editProfileButton} >
             <Text style={styles.editProfileText}>Edit profile</Text>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </Link>
+        
         
       </View>
       <Text style={styles.subtitle}>Achievements</Text>

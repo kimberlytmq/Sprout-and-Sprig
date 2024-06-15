@@ -1,6 +1,8 @@
 import { Slot, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import { AuthContextProvider, useAuth } from "../context/authContext";
+import { Stack } from 'expo-router';
+
 
 const MainLayout = ()=>{
   const {isAuthenticated} = useAuth();
