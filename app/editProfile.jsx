@@ -1,20 +1,23 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'expo-router'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { app } from '../FirebaseConfig';
+import * as FileSystem from 'expo-file-system';
 
 const EditProfile = () => {
   const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
   const [username, setUsername] = useState("a");
   const [email, setEmail] = useState("ameliachowhl204@gmail.com");
   const [password, setPassword] = useState("123456");
+  const [uploading, setUploading] = useState('false');
 
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsEditing: true,
-      aspect: [4, 4],
+      aspect: [4, 3],
       quality: 1
     });
 
@@ -24,6 +27,39 @@ const EditProfile = () => {
       setSelectedImage(result.assets[0].uri);
     }
   };
+
+  //upload media files
+  const uploadMedia = async () => {
+    setUploading(true);
+  
+
+  try {
+    const { uri } = await FileSystem.getInfoAsync(selectedImage);
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = () => {
+        resolve(xhr.response);
+      };
+      xhr.onerror = (e) => {
+        reject(new TypeError('Network request failed'));
+      };
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+      xhr.send(null);
+    });
+
+    const filename = selectedImage.substring(selectedImage.lastIndexOf('/') + 1);
+    const ref = app.storage().ref().child(filename);
+
+    await ref.put(blob);
+    setUploading(false);
+    Alert.alert('Photo Uploaded');
+    setSelectedImage(null);
+  } catch(error) {
+    console.error(error);
+    setUploading(false);
+  }
+}
 
   return (
     <View style={styles.container}>
@@ -56,6 +92,10 @@ const EditProfile = () => {
                 />
                 </View>
           </TouchableOpacity>
+            <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
+              <Text style = {styles.uploadText}>Upload Image</Text>
+            </TouchableOpacity>
+        
       </View>
 
       <View style={styles.inputContainer}>
@@ -163,5 +203,15 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
       fontSize: 18
+    },
+    uploadButton: {
+      padding: 5,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    uploadText: {
+      color: "#397004",
+      fontWeight: 'bold',
+      fontSize: 15
     }
 })
