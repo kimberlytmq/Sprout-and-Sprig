@@ -3,8 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { Link } from 'expo-router'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
-import { app } from '../FirebaseConfig';
+import { app, db } from '../FirebaseConfig';
 import * as FileSystem from 'expo-file-system';
+import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
+import { updateDoc, doc } from 'firebase/firestore';
+import { storage } from '../FirebaseConfig';
+import { getAuth } from 'firebase/auth';
 
 const EditProfile = () => {
   const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
@@ -12,6 +16,8 @@ const EditProfile = () => {
   const [email, setEmail] = useState("ameliachowhl204@gmail.com");
   const [password, setPassword] = useState("123456");
   const [uploading, setUploading] = useState('false');
+  const auth = getAuth();
+  const user = auth.currentUser;
 
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -25,39 +31,77 @@ const EditProfile = () => {
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
+      await uploadImage(result.assets[0].uri, "image");
     }
   };
 
-  //upload media files
-  const uploadMedia = async () => {
-    setUploading(true);
-  
+  // const uploadMedia = async () => {
+  //   setUploading(true);
 
+  // try {
+  //   const { uri } = await FileSystem.getInfoAsync(selectedImage);
+  //   const blob = await new Promise((resolve, reject) => {
+  //     const xhr = new XMLHttpRequest();
+  //     xhr.onload = () => {
+  //       resolve(xhr.response);
+  //     };
+  //     xhr.onerror = (e) => {
+  //       reject(new TypeError('Network request failed'));
+  //     };
+  //     xhr.responseType = 'blob';
+  //     xhr.open('GET', uri, true);
+  //     xhr.send(null);
+  //   });
+
+//     const filename = selectedImage.substring(selectedImage.lastIndexOf('/') + 1);
+//     const ref = app.storage().ref('profile pictures').child(filename);
+
+//     await ref.put(blob);
+//     setUploading(false);
+//     Alert.alert('Photo Uploaded');
+//     setSelectedImage(null);
+//   } catch(error) {
+//     console.error(error);
+//     setUploading(false);
+//   }
+// }
+
+//upload image files
+async function uploadImage(uri, fileType) {
+  const response = await fetch(uri);
+  const blob = await response.blob();
+
+  const storageRef = ref(storage, "Profile Pictures/" + new Date().getTime());
+  const uploadTask = uploadBytesResumable(storageRef, blob);
+
+  //listen for events
+  uploadTask.on("state_changed",
+    (snapshot) => {
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log("progress", progress + "% done");
+    }, 
+    (error) => {
+      //handle error
+    },
+     () => {
+      getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+        console.log("File available at", downloadURL);
+        await saveRecord(fileType, downloadURL, new Date().toISOString());
+      })
+     }
+  )
+}
+
+async function saveRecord(fileType, url, createdAt) {
   try {
-    const { uri } = await FileSystem.getInfoAsync(selectedImage);
-    const blob = await new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest();
-      xhr.onload = () => {
-        resolve(xhr.response);
-      };
-      xhr.onerror = (e) => {
-        reject(new TypeError('Network request failed'));
-      };
-      xhr.responseType = 'blob';
-      xhr.open('GET', uri, true);
-      xhr.send(null);
+    const uid = user.uid;
+    const userDoc = doc(db, 'users', user.uid)
+    const docRef = await updateDoc(userDoc, {
+      profilePicture: url
     });
-
-    const filename = selectedImage.substring(selectedImage.lastIndexOf('/') + 1);
-    const ref = app.storage().ref().child(filename);
-
-    await ref.put(blob);
-    setUploading(false);
-    Alert.alert('Photo Uploaded');
-    setSelectedImage(null);
-  } catch(error) {
-    console.error(error);
-    setUploading(false);
+    console.log("image saved correctly");
+  } catch (e) {
+    console.log(e)
   }
 }
 
@@ -92,9 +136,6 @@ const EditProfile = () => {
                 />
                 </View>
           </TouchableOpacity>
-            <TouchableOpacity style={styles.uploadButton} onPress={uploadMedia}>
-              <Text style = {styles.uploadText}>Upload Image</Text>
-            </TouchableOpacity>
         
       </View>
 
@@ -203,15 +244,5 @@ const styles = StyleSheet.create({
       color: '#fff',
       fontWeight: 'bold',
       fontSize: 18
-    },
-    uploadButton: {
-      padding: 5,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
-    uploadText: {
-      color: "#397004",
-      fontWeight: 'bold',
-      fontSize: 15
     }
 })

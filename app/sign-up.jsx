@@ -15,6 +15,7 @@ export default function SignUp() {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const usernameRef = useRef("");
+  const profilePictureRef = useRef("");
 
   const handleSignUp = async ()=>{
     if(!emailRef.current || !passwordRef.current || !usernameRef.current) {
@@ -23,7 +24,7 @@ export default function SignUp() {
     }
     setLoading(true);
 
-    let response = await signup(usernameRef.current, emailRef.current, passwordRef.current)
+    let response = await signup(usernameRef.current, emailRef.current, passwordRef.current, profilePictureRef.current)
     setLoading(false);
 
     console.log('got result: ', response);
