@@ -1,15 +1,16 @@
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import { useState } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, useRef } from 'react-native';
+import { Camera, useCameraPermissions } from 'expo-camera';
+import { useState, useRef } from 'react';
+import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
 
 
-export default function Camera() {
+export default function CameraScreen() {
  const [facing, setFacing] = useState('back');
  const [cameraPermission, requestCameraPermission] = useCameraPermissions();
  const [mediaLibraryPermission, requestMediaLibraryPermission] = MediaLibrary.usePermissions();
  const [image, setImage] = useState(null);
  const [flash, setFlash] = useState('off');
+ const cameraRef = useRef(null);
 
  if (!cameraPermission) {
    // Camera permissions are still loading.

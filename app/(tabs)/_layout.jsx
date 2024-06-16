@@ -66,7 +66,7 @@ export default function Layout(){
       />
 
       <Tabs.Screen
-        name="camera"
+        name="camera-screen"
         options={{
           tabBarIcon: ({ focused })=>(
             <View style={{
