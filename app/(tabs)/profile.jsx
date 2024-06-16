@@ -19,23 +19,6 @@ const Profile = () => {
   const user = auth.currentUser;
   const navigation = useNavigation();
 
-  const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
-
-  const handleImageSelection = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 4],
-      quality: 1
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  };
-
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -86,24 +69,11 @@ const Profile = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleImageSelection}>
-            <Image
-            source={{ uri: selectedImage }}
+          <Image
+            source={{ uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' }}
             style={styles.profile} 
-            />
+          />
 
-            <View style={styles.cameraContainer}>
-              <Ionicons 
-              name={'camera'}
-              color={'#fff'}
-              size={30}
-              style={styles.camera}
-              opacity={0.8}
-              />
-              </View>
-
-         
-        </TouchableOpacity>
         <Text style={styles.title}>{username}</Text>
         <View style={styles.emailContainer}>
           <Ionicons 
