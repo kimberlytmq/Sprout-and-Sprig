@@ -7,13 +7,15 @@ import Search from './(tabs)/search';
 import { Ionicons } from "@expo/vector-icons";
 import CustomKeyboardView from '../context/CustomKeyboardView';
 import { useAuth } from '../context/authContext';
+import { getAuth } from 'firebase/auth';
+import { updateDoc, doc, getDoc } from 'firebase/firestore';
+import { app, db } from '../FirebaseConfig';
 
 
 export default function LogIn() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(false);
-
 
   const {login} = useAuth();
 

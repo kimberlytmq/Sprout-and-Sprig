@@ -1,10 +1,9 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert, ActivityIndicator } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Link } from 'expo-router'
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { app, db } from '../FirebaseConfig';
-import * as FileSystem from 'expo-file-system';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import { storage } from '../FirebaseConfig';
@@ -17,7 +16,7 @@ const EditProfile = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [uploading, setUploading] = useState('false');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -38,6 +37,66 @@ const EditProfile = () => {
 
     fetchUsername();
   }, [user]);
+
+  useEffect(() => {
+    const fetchEmail = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setEmail(docSnap.data().email);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchEmail();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchPassword = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setPassword(docSnap.data().password);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchPassword();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setSelectedImage(docSnap.data().profilePicture);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, [user]);
   
 
   const handleImageSelection = async () => {
@@ -52,48 +111,19 @@ const EditProfile = () => {
 
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
-      await uploadImage(result.assets[0].uri, "image");
+      //await uploadImage(result.assets[0].uri, "image");
     }
   };
 
-  // const uploadMedia = async () => {
-  //   setUploading(true);
-
-  // try {
-  //   const { uri } = await FileSystem.getInfoAsync(selectedImage);
-  //   const blob = await new Promise((resolve, reject) => {
-  //     const xhr = new XMLHttpRequest();
-  //     xhr.onload = () => {
-  //       resolve(xhr.response);
-  //     };
-  //     xhr.onerror = (e) => {
-  //       reject(new TypeError('Network request failed'));
-  //     };
-  //     xhr.responseType = 'blob';
-  //     xhr.open('GET', uri, true);
-  //     xhr.send(null);
-  //   });
-
-//     const filename = selectedImage.substring(selectedImage.lastIndexOf('/') + 1);
-//     const ref = app.storage().ref('profile pictures').child(filename);
-
-//     await ref.put(blob);
-//     setUploading(false);
-//     Alert.alert('Photo Uploaded');
-//     setSelectedImage(null);
-//   } catch(error) {
-//     console.error(error);
-//     setUploading(false);
-//   }
-// }
-
 //upload image files
 async function uploadImage(uri, fileType) {
+  setUploading(true);
   const response = await fetch(uri);
   const blob = await response.blob();
 
   const storageRef = ref(storage, "Profile Pictures/" + new Date().getTime());
   const uploadTask = uploadBytesResumable(storageRef, blob);
+
 
   //listen for events
   uploadTask.on("state_changed",
@@ -106,21 +136,38 @@ async function uploadImage(uri, fileType) {
     },
      () => {
       getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+        setUploading(false);
         console.log("File available at", downloadURL);
-        await saveRecord(fileType, downloadURL, new Date().toISOString());
+        //await saveRecord(downloadURL);
       })
      }
   )
 }
 
-async function saveRecord(fileType, url, createdAt) {
+
+async function saveChanges(url, newUsername) {
   try {
-    const uid = user.uid;
+    //await uploadImage(url, "image");
+    setUploading(true);
     const userDoc = doc(db, 'users', user.uid)
+    // if (newEmail != user.email) {
+    //   updateEmail(newEmail);
+    //   console.log("email updated");
+    // }
+
+    // if (newPassword != user.password) {
+    //   updatePassword(newPassword);
+    //   console.log("password updated");
+    // }
+
     const docRef = await updateDoc(userDoc, {
-      profilePicture: url
+      profilePicture: url,
+      username: newUsername,
+      // email: newEmail,
+      // password: newPassword
     });
-    console.log("image saved correctly");
+    setUploading(false);
+    console.log("changes saved correctly");
   } catch (e) {
     console.log(e)
   }
@@ -169,7 +216,7 @@ async function saveRecord(fileType, url, createdAt) {
           style={styles.input}
           />
 
-        <Text style={styles.text}>Email</Text>
+        {/* <Text style={styles.text}>Email</Text>
         <TextInput 
           value={email}
           onChangeText={value => setEmail(value)}
@@ -184,13 +231,26 @@ async function saveRecord(fileType, url, createdAt) {
           editable={true}
           style={styles.input}
           secureTextEntry
-          />
+          /> */}
           
       </View>
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Save Changes</Text>
-      </TouchableOpacity>
+      { uploading ? (<ActivityIndicator size="large" color="#0000ff"/> 
+        ) : (
+          <>
+             <TouchableOpacity 
+              style={styles.button} 
+              onPress={() => {
+                uploadImage(selectedImage, "image");
+                saveChanges(selectedImage, username);
+            }}>
+              <Text style={styles.buttonText}>Save Changes</Text>
+            </TouchableOpacity>  
+          </>
+        )
+      }
+
+     
       
     </View>
   )
