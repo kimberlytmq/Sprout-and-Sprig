@@ -15,6 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 const Profile = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
+  const [profilePicture, setProfilePicture] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
   const auth = getAuth();
   const user = auth.currentUser;
   const navigation = useNavigation();
@@ -59,6 +60,26 @@ const Profile = () => {
     fetchEmail();
   }, [user]);
 
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setProfilePicture(docSnap.data().profilePicture);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchProfilePicture();
+  }, [user]);
+
 
   const { logout } = useAuth();
   const handleLogout = async ()=>{
@@ -70,7 +91,7 @@ const Profile = () => {
     <View style={styles.container}>
       <View style={styles.header}>
           <Image
-            source={{ uri: 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png' }}
+            source={{ uri: profilePicture }}
             style={styles.profile} 
           />
 

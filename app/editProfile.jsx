@@ -6,18 +6,39 @@ import * as ImagePicker from "expo-image-picker";
 import { app, db } from '../FirebaseConfig';
 import * as FileSystem from 'expo-file-system';
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { updateDoc, doc } from 'firebase/firestore';
+import { updateDoc, doc, getDoc } from 'firebase/firestore';
 import { storage } from '../FirebaseConfig';
 import { getAuth } from 'firebase/auth';
 
 const EditProfile = () => {
-  const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
-  const [username, setUsername] = useState("a");
-  const [email, setEmail] = useState("ameliachowhl204@gmail.com");
-  const [password, setPassword] = useState("123456");
-  const [uploading, setUploading] = useState('false');
   const auth = getAuth();
   const user = auth.currentUser;
+  const [selectedImage, setSelectedImage] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [uploading, setUploading] = useState('false');
+
+  useEffect(() => {
+    const fetchUsername = async () => {
+      try {
+        if (user) {
+          const userDoc = doc(db, 'users', user.uid);
+          const docSnap = await getDoc(userDoc);
+          if (docSnap.exists()) {
+            setUsername(docSnap.data().username);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchUsername();
+  }, [user]);
+  
 
   const handleImageSelection = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
