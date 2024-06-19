@@ -1,116 +1,110 @@
-import { CameraView, useCameraPermissions, Camera, CameraType } from 'expo-camera';
-import React, { useState, useEffect, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import * as MediaLibrary from 'expo-media-library';
+import { View, Text, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native'
+import React, { useEffect, useRef } from 'react'
+import { useCameraPermission, useCameraDevice, Camera } from 'react-native-vision-camera'
 
-export default function CameraScreen() {
-  const [hasCameraPermission, setHasCameraPermission] = useState(null);
-  const [image, setImage] = useState(null);
-  //const [type, setType] = useState(Camera.Constants.Type.back);
-  const [facing, setFacing] = useState('back');
-  //const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
-  const cameraRef = useRef(null);
+const CameraScreen = () => {
+  const { hasPermission, requestPermission } = useCameraPermission();
+
+  const device = useCameraDevice('back');
+  const cameraRef = useRef<Camera>(null);
 
   useEffect(() => {
-    (async () => {
-      MediaLibrary.requestPermissionsAsync();
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === 'granted');
-    })();
-  }, [])
+    if (!hasPermission) {
+      requestPermission();
+    }
+  }, [hasPermission]);
 
-  const takePicture = async () => {
-      try {
-        if (cameraRef) {
-        const data = await cameraRef.current.takePictureAsync();
-        console.log(data);
-        setImage(data.uri);
-      }  
-    } catch (e) {
-      console.log(e);
-    } 
-    
+  const onTakePicturePressed = async () => {
+    const photo = await cameraRef.current?.takePhoto();
+    console.log(photo);
+
   }
 
-  if (hasCameraPermission === false) {
-    return <Text>No access to camera</Text>
+  if (!hasPermission) {
+    return <ActivityIndicator />
   }
 
-
-  function toggleCameraFacing() {
-    setFacing(current => (current === 'back' ? 'front' : 'back'));
+  if (!device) {
+    return <Text style={{marginTop: 100}}>Camera device not found</Text>
   }
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady>
-        <Text>Hello</Text>
+      <Camera 
+        ref={cameraRef}
+        style={StyleSheet.absoluteFill} 
+        device={device} 
+        isActive={true}
+        photo={true}
+      />
+      <TouchableOpacity style={styles.button} onPress={onTakePicturePressed}>
 
-      </CameraView>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.button} onPress={takePicture}>
-          <Text style={styles.buttonText}>Take a picture</Text>
-        </TouchableOpacity>
-      </View>
-
-
+      </TouchableOpacity>
     </View>
-  );
+  )
 }
+
+export default CameraScreen
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: '#000',
-    //alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10
-  },
-  camera: {
-    flex: 1,
-    borderRadius: 20,
-  },
-  buttonContainer: {
-    marginBottom: 120
+    flex: 1
   },
   button: {
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  buttonText: {
-    fontSize: 20,
-    fontWeight: 'bold'
+    position: 'absolute',
+    alignSelf: 'center',
+    bottom: 50,
+    width: 75,
+    height: 75,
+    backgroundColor: 'white',
+    borderRadius: 75
   }
-})
+});
 
-// export default function App() {
-//   const [facing, setFacing] = useState('back');
-//   const [permission, requestPermission] = useCameraPermissions();
+
+
+
+
+
+
+// import { CameraView, useCameraPermissions, Camera, CameraType } from 'expo-camera';
+// import React, { useState, useEffect, useRef } from 'react';
+// import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+// import * as MediaLibrary from 'expo-media-library';
+
+// export default function CameraScreen() {
+//   const [hasCameraPermission, setHasCameraPermission] = useState(null);
 //   const [image, setImage] = useState(null);
+//   //const [type, setType] = useState(Camera.Constants.Type.back);
+//   const [facing, setFacing] = useState('back');
+//   //const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+//   const cameraRef = useRef(null);
+
+//   useEffect(() => {
+//     (async () => {
+//       MediaLibrary.requestPermissionsAsync();
+//       const cameraStatus = await Camera.requestCameraPermissionsAsync();
+//       setHasCameraPermission(cameraStatus.status === 'granted');
+//     })();
+//   }, [])
 
 //   const takePicture = async () => {
-//     const data = await Camera.takePictureAsync();
-//     console.log(data);
-//     setImage(data.uri);
-
+//       try {
+//         if (cameraRef) {
+//         const data = await cameraRef.current.takePictureAsync();
+//         console.log(data);
+//         setImage(data.uri);
+//       }  
+//     } catch (e) {
+//       console.log(e);
+//     } 
+    
 //   }
 
-//   if (!permission) {
-//     // Camera permissions are still loading.
-//     return <View />;
+//   if (hasCameraPermission === false) {
+//     return <Text>No access to camera</Text>
 //   }
 
-//   if (!permission.granted) {
-//     // Camera permissions are not granted yet.
-//     return (
-//       <View style={styles.container}>
-//         <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
-//         <Button onPress={requestPermission} title="grant permission" />
-//       </View>
-//     );
-//   }
 
 //   function toggleCameraFacing() {
 //     setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -118,16 +112,18 @@ const styles = StyleSheet.create({
 
 //   return (
 //     <View style={styles.container}>
-//       <CameraView style={styles.camera} facing={facing}>
-//         <View style={styles.buttonContainer}>
-//           <TouchableOpacity style={styles.button} onPress={takePicture}>
-//             <Text style={styles.text}>Capture</Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-//             <Text style={styles.text}>Flip Camera</Text>
-//           </TouchableOpacity>
-//         </View>
+//       <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady>
+//         <Text>Hello</Text>
+
 //       </CameraView>
+
+//       <View style={styles.buttonContainer}>
+//         <TouchableOpacity style={styles.button} onPress={takePicture}>
+//           <Text style={styles.buttonText}>Take a picture</Text>
+//         </TouchableOpacity>
+//       </View>
+
+
 //     </View>
 //   );
 // }
@@ -135,30 +131,29 @@ const styles = StyleSheet.create({
 // const styles = StyleSheet.create({
 //   container: {
 //     flex: 1,
+//     backgroundColor: '#000',
+//     //alignItems: 'center',
 //     justifyContent: 'center',
+//     padding: 10
 //   },
 //   camera: {
 //     flex: 1,
+//     borderRadius: 20,
 //   },
 //   buttonContainer: {
-//     //flex: 1,
-//     flexDirection: 'row',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     backgroundColor: 'black',
-//     margin: 64,
+//     marginBottom: 120
 //   },
 //   button: {
-//     flex: 1,
-//     alignSelf: 'flex-end',
-//     alignItems: 'center',
+//     backgroundColor: '#fff',
+//     justifyContent: 'center',
+//     alignItems: 'center'
 //   },
-//   text: {
-//     fontSize: 24,
-//     fontWeight: 'bold',
-//     color: 'white',
-//   },
-// });
+//   buttonText: {
+//     fontSize: 20,
+//     fontWeight: 'bold'
+//   }
+// })
+
 
 // import { Camera, useCameraPermissions, cameraType } from 'expo-camera';
 // import { useState, useRef, useEffect } from 'react';
