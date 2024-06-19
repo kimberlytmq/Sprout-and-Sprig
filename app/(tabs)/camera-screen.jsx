@@ -1,47 +1,41 @@
-import { CameraView, useCameraPermissions, Camera } from 'expo-camera';
-import { useState, useRef } from 'react';
+import { CameraView, useCameraPermissions, Camera, CameraType } from 'expo-camera';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as MediaLibrary from 'expo-media-library';
 
-export default function App() {
-  const [facing, setFacing] = useState('back');
-  const [permission, requestPermission] = useCameraPermissions();
-  const cameraRef = useRef(null);
+export default function CameraScreen() {
+  const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [image, setImage] = useState(null);
+  //const [type, setType] = useState(Camera.Constants.Type.back);
+  const [facing, setFacing] = useState('back');
+  //const [flash, setFlash] = useState(Camera.Constants.FlashMode.off);
+  const cameraRef = useRef(null);
 
-  // const takePicture = async () => {
-  //   if (cameraRef) {
-  //     try {
-  //       const data = await cameraRef.current.takePictureAsync();
-  //       console.log(data);
-  //       setImage(data.uri);
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //   }
-  //     try {
-  //       const data = await Camera.takePictureAsync();
-  //       console.log(data);
-  //       setImage(data.uri);
-  //     } catch (e) {
-  //       console.log(e);
-  //     }
-  //   }
-  
+  useEffect(() => {
+    (async () => {
+      MediaLibrary.requestPermissionsAsync();
+      const cameraStatus = await Camera.requestCameraPermissionsAsync();
+      setHasCameraPermission(cameraStatus.status === 'granted');
+    })();
+  }, [])
 
-  if (!permission) {
-    // Camera permissions are still loading.
-    return <View />;
+  const takePicture = async () => {
+      try {
+        if (cameraRef) {
+        const data = await cameraRef.current.takePictureAsync();
+        console.log(data);
+        setImage(data.uri);
+      }  
+    } catch (e) {
+      console.log(e);
+    } 
+    
   }
 
-  if (!permission.granted) {
-    // Camera permissions are not granted yet.
-    return (
-      <View style={styles.container}>
-        <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
-        <Button onPress={requestPermission} title="grant permission" />
-      </View>
-    );
+  if (hasCameraPermission === false) {
+    return <Text>No access to camera</Text>
   }
+
 
   function toggleCameraFacing() {
     setFacing(current => (current === 'back' ? 'front' : 'back'));
@@ -49,16 +43,18 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing}>
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.button} onPress = {takePicture}>
-            <Text style={styles.text}>Capture</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
-            <Text style={styles.text}>Flip Camera</Text>
-          </TouchableOpacity>
-        </View>
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady>
+        <Text>Hello</Text>
+
       </CameraView>
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={takePicture}>
+          <Text style={styles.buttonText}>Take a picture</Text>
+        </TouchableOpacity>
+      </View>
+
+
     </View>
   );
 }
@@ -66,31 +62,103 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#000',
+    //alignItems: 'center',
     justifyContent: 'center',
+    padding: 10
   },
   camera: {
     flex: 1,
+    borderRadius: 20,
   },
   buttonContainer: {
-    //flex: 1,
-    //flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center'
+    marginBottom: 120
   },
   button: {
-    //flex: 1,
-    //alignSelf: 'center',
-    alignItems: 'center',
+    backgroundColor: '#fff',
     justifyContent: 'center',
-    backgroundColor: 'black',
-    marginTop: 100
+    alignItems: 'center'
   },
-  text: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-});
+  buttonText: {
+    fontSize: 20,
+    fontWeight: 'bold'
+  }
+})
+
+// export default function App() {
+//   const [facing, setFacing] = useState('back');
+//   const [permission, requestPermission] = useCameraPermissions();
+//   const [image, setImage] = useState(null);
+
+//   const takePicture = async () => {
+//     const data = await Camera.takePictureAsync();
+//     console.log(data);
+//     setImage(data.uri);
+
+//   }
+
+//   if (!permission) {
+//     // Camera permissions are still loading.
+//     return <View />;
+//   }
+
+//   if (!permission.granted) {
+//     // Camera permissions are not granted yet.
+//     return (
+//       <View style={styles.container}>
+//         <Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
+//         <Button onPress={requestPermission} title="grant permission" />
+//       </View>
+//     );
+//   }
+
+//   function toggleCameraFacing() {
+//     setFacing(current => (current === 'back' ? 'front' : 'back'));
+//   }
+
+//   return (
+//     <View style={styles.container}>
+//       <CameraView style={styles.camera} facing={facing}>
+//         <View style={styles.buttonContainer}>
+//           <TouchableOpacity style={styles.button} onPress={takePicture}>
+//             <Text style={styles.text}>Capture</Text>
+//           </TouchableOpacity>
+//           <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
+//             <Text style={styles.text}>Flip Camera</Text>
+//           </TouchableOpacity>
+//         </View>
+//       </CameraView>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: {
+//     flex: 1,
+//     justifyContent: 'center',
+//   },
+//   camera: {
+//     flex: 1,
+//   },
+//   buttonContainer: {
+//     //flex: 1,
+//     flexDirection: 'row',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     backgroundColor: 'black',
+//     margin: 64,
+//   },
+//   button: {
+//     flex: 1,
+//     alignSelf: 'flex-end',
+//     alignItems: 'center',
+//   },
+//   text: {
+//     fontSize: 24,
+//     fontWeight: 'bold',
+//     color: 'white',
+//   },
+// });
 
 // import { Camera, useCameraPermissions, cameraType } from 'expo-camera';
 // import { useState, useRef, useEffect } from 'react';
