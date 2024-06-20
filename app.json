@@ -13,26 +13,14 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true,
-      "infoPlist": {
-        "NSCameraUsageDescription": "$(PRODUCT_NAME) needs access to your Camera.",
-        "NSMicrophoneUsageDescription": "$(PRODUCT_NAME) needs access to your Microphone."
-      },
-      "bundleIdentifier": "com.ac1012.SproutSG"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.ac1012.SproutSG",
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.READ_EXTERNAL_STORAGE",
-        "android.permission.WRITE_EXTERNAL_STORAGE",
-        "android.permission.ACCESS_MEDIA_LOCATION"
-      ]
+      "package": "com.ac1012.SproutSG"
     },
     "web": {
       "bundler": "metro",
@@ -61,14 +49,6 @@
         "expo-image-picker",
         {
           "photosPermission": "The app accesses your photos to let you share them with your friends."
-        }
-      ],
-      [
-        "react-native-vision-camera",
-        {
-          "cameraPermissionText": "$(PRODUCT_NAME) needs access to your Camera.",
-          "enableMicrophonePermission": true,
-          "microphonePermissionText": "$(PRODUCT_NAME) needs access to your Microphone."
         }
       ]
     ],
