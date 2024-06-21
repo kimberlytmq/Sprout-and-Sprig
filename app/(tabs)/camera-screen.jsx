@@ -43,7 +43,7 @@ export default function CameraScreen() {
 
   return (
     <View style={styles.container}>
-      <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady>
+      <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady={true}>
         <Text>Hello</Text>
 
       </CameraView>
