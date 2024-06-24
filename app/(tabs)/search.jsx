@@ -18,7 +18,7 @@ const Search = ({ navigation }) => {
 
   const handleSearch = (query) => {
     setSearchQuery(query)
-    const formattedQuery = query.toLowerCase();
+    const formattedQuery = query.toLowerCase().replace(/[\u2019]/g, "'");
     const filteredData = filter(plantSpecies, (plant) => {
       return contains(plant, formattedQuery)
     })
@@ -26,14 +26,18 @@ const Search = ({ navigation }) => {
   }
 
   const contains = ({common_name, scientific_name}, query) => {
+    const normalizedCommonName = common_name ? common_name.toLowerCase().replace(/[\u2019]/g, "'") : "";
+    const normalizedScientificNames = scientific_name ? scientific_name.map(name => name.toLowerCase().replace(/[\u2019]/g, "'")) : [];
+
     if (
-      (common_name && common_name.toLowerCase().includes(query)) ||
-      (scientific_name && scientific_name.some(name => name.toLowerCase().includes(query)))
+      (normalizedCommonName && normalizedCommonName.includes(query)) ||
+      (normalizedScientificNames && normalizedScientificNames.some(name => name.includes(query)))
     ) {
-      return true
+      return true;
     }
-    return false
-  }
+    return false;
+  };
+
 
   return (
     <SafeAreaView style={styles.container}>
