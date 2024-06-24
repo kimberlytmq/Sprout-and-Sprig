@@ -114,6 +114,7 @@ const Profile = () => {
       </View>
       <Text style={styles.subtitle}>Achievements</Text>
       <Text style={styles.subtitle}>Photos</Text>
+      <Text style={styles.subtitle}>Settings</Text>
       <TouchableOpacity style={styles.button} onPress={handleLogout} >
         <Text style={styles.buttonText} >Logout</Text>
       </TouchableOpacity> 
