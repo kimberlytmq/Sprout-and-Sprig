@@ -57,6 +57,11 @@ export const AuthContextProvider = ({children}) => {
         profilePicture,
         userId: response?.user?.uid,
       })
+
+      await setDoc(doc(db, "images", response?.user?.uid), {
+        images: []
+      })
+      
       return {success: true, data: response?.user};
     } catch(e) {
       let msg = e.message

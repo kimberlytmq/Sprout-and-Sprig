@@ -7,8 +7,6 @@ import { getAuth } from 'firebase/auth';
 import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../context/authContext';
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from '@react-navigation/native';
-import EditProfile from '../editProfile';
 import * as ImagePicker from "expo-image-picker";
 
 
@@ -18,7 +16,6 @@ const Profile = () => {
   const [profilePicture, setProfilePicture] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
   const auth = getAuth();
   const user = auth.currentUser;
-  const navigation = useNavigation();
 
   useEffect(() => {
     const fetchUsername = async () => {

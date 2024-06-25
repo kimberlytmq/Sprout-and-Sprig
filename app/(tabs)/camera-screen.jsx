@@ -1,11 +1,17 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, SafeAreaView, Alert } from 'react-native'
 import React, { useState } from 'react'
 import * as ImagePicker from 'expo-image-picker';
+import { getAuth } from 'firebase/auth';
+import { db } from '../../FirebaseConfig'
+import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 const CameraScreen = () => {
   const [image, setImage] = useState('');
   const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions();
+  const auth = getAuth();
+  const user = auth.currentUser;
+  const [isLoading, setIsLoading] = useState(false);
 
   if (!cameraPermission) {
        // Camera permissions are still loading.
@@ -85,6 +91,27 @@ const CameraScreen = () => {
     }
   };
 
+  const uploadImage = async () => {
+    setIsLoading(true);
+    const docRef = doc(db, "images", user.uid);
+    await updateDoc(docRef, {
+      images: arrayUnion(image)
+    });
+    console.log("image added to biodex")
+    setImage('');
+    setIsLoading(false);
+    Alert.alert("Image added to Biodex!");
+  };
+
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large"/>
+        <Text>Loading</Text>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <View style={styles.container}>
@@ -94,7 +121,10 @@ const CameraScreen = () => {
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Text style={styles.buttonText}>Pick an image</Text>
       </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.image} />}
+      {image && <Image source={{ uri: image }} style={styles.image} /> }
+      {image && <TouchableOpacity style={styles.button} onPress={uploadImage}>
+        <Text style={styles.buttonText}>Add image to Biodex</Text>
+      </TouchableOpacity> }
 
     </View>
   )
@@ -122,6 +152,12 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
+    marginBottom: 20
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 })
 
