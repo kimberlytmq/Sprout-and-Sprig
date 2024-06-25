@@ -13,7 +13,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ac1012.SproutSG",
+      "config": {
+        "googleMapsApiKey": "AIzaSyBM3UPd62ClcZKmoAkHh4p7c-j5-qQ3zJ8"
+      }
     },
     "android": {
       "adaptiveIcon": {
