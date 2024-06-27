@@ -6,7 +6,8 @@ import { db } from '../../FirebaseConfig'
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 
 const CameraScreen = () => {
-  const [image, setImage] = useState('');
+  const defaultImageUrl = 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png';
+  const [image, setImage] = useState(defaultImageUrl);
   const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions();
   const auth = getAuth();
@@ -98,7 +99,7 @@ const CameraScreen = () => {
       images: arrayUnion(image)
     });
     console.log("image added to biodex")
-    setImage('');
+    setImage(defaultImageUrl);
     setIsLoading(false);
     Alert.alert("Image added to Biodex!");
   };
@@ -121,8 +122,13 @@ const CameraScreen = () => {
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Text style={styles.buttonText}>Pick an image</Text>
       </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.image} /> }
-      {image && <TouchableOpacity style={styles.button} onPress={uploadImage}>
+      {/* {image &&  */}
+      <Text style={styles.imageText}>Image: </Text>
+      <Image source={{ uri: image }} style={styles.image} /> 
+      {/* } */}
+      {image && image!=defaultImageUrl 
+      && 
+      <TouchableOpacity style={styles.button} onPress={uploadImage}>
         <Text style={styles.buttonText}>Add image to Biodex</Text>
       </TouchableOpacity> }
 
@@ -152,12 +158,20 @@ const styles = StyleSheet.create({
   image: {
     width: 200,
     height: 200,
-    marginBottom: 20
+    marginBottom: 20,
+    marginTop: 10,
+    borderWidth: 1
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  imageText: {
+    color: "#397004",
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginTop: 20
   }
 })
 

@@ -1,16 +1,22 @@
-import { View, Text, StyleSheet, FlatList, SafeAreaView, Image } from 'react-native'
-import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
+import React, { useState, useEffect, useRef } from 'react'
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
-import { doc, getDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import plantSpecies from '../../context/species_data.json';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { Ionicons } from "@expo/vector-icons";
 
 const Biodex = () => {
-  const defaultImageUrl = 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png';
   const [images, setImages] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
+  const bottomSheetRef = useRef(null);
+  const snapPoints = ['30%'];
+  const [currentPlant, setCurrentPlant] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchImages = async () => {
     const docRef = doc(db, "images", user.uid);
@@ -33,24 +39,87 @@ const Biodex = () => {
     fetchImages();
   }, []);
 
+  const openBottomSheet = (plant) => {
+    setCurrentPlant(plant);
+    //console.log(plant);
+    bottomSheetRef.current?.present();
+  }
+
+  const removeImage = async () => { 
+      setIsLoading(true);
+      const docRef = doc(db, "images", user.uid);
+      await updateDoc(docRef, {
+        images: arrayRemove(currentPlant)
+      });
+      console.log("plant removed from biodex")
+      fetchImages();
+      setIsLoading(false);
+  };
+
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large"/>
+        <Text>Loading</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Biodex</Text>
-      <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
-      <FlatList 
-        data={images}
-        numColumns={2}
-        renderItem={({ item }) => {
-          return (
-            <View style={styles.card}>
-              <Image source={{uri: item}} style={styles.image}/>
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <SafeAreaView style={styles.container}>
+          <Text style={styles.title}>Biodex</Text>
+          <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
+          <FlatList 
+            data={images}
+            numColumns={2}
+            renderItem={({ item }) => {
+              return (
+                <View style={styles.card}>
+                  <TouchableOpacity onPress={() => openBottomSheet(item)}>
+                    <Image source={{uri: item}} style={styles.image}/>
+                  </TouchableOpacity>
+                  
+                </View>
+              )
+            }}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}   
+          />
+        </SafeAreaView>
+        <BottomSheetModal
+          ref={bottomSheetRef}
+          snapPoints={snapPoints}
+          index={0}
+        >
+          <View style={styles.bottomSheetContainer}>
+            <View style={styles.buttonContainer}>
+              <Ionicons
+                name={"information-circle-outline"}
+                color={"#397004"}
+                size={26}
+              />
+              <Text style={styles.buttonText}>Learn more</Text>
             </View>
-          )
-        }}
-        refreshing={refreshing}
-        onRefresh={handleRefresh}   
-      />
-    </SafeAreaView>
+
+            <TouchableOpacity onPress={removeImage}>
+              <View style={styles.buttonContainer}>
+                <Ionicons
+                  name={"trash-outline"}
+                  color={"#397004"}
+                  size={26}
+                />
+                <Text style={styles.buttonText}>Remove plant</Text>
+              </View>
+            </TouchableOpacity>
+
+          </View>
+
+        </BottomSheetModal>
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+   
   )
 }
 
@@ -103,5 +172,26 @@ const styles = StyleSheet.create({
   smallText: {
     fontSize: 12,
     fontStyle: "italic"
+  },
+  bottomSheetContainer: {
+    backgroundColor: "#E9F7EF",
+    flex: 1,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 20,
+    marginTop: 20
+  },
+  buttonText: {
+    color: "#397004",
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 5
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   }
 });
