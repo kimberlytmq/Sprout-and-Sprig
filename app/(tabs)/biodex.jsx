@@ -36,6 +36,7 @@ const Biodex = () => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Biodex</Text>
+      <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
       <FlatList 
         data={images}
         numColumns={2}
@@ -66,7 +67,11 @@ const styles = StyleSheet.create({
     color: "#397004",
     fontWeight: 'bold',
     marginTop: 10
-
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#397004",
+    marginTop: 10
   },
   card: {
     borderColor: "#397004",
