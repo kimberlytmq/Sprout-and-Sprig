@@ -61,6 +61,10 @@ export const AuthContextProvider = ({children}) => {
       await setDoc(doc(db, "images", response?.user?.uid), {
         images: []
       })
+
+      await setDoc(doc(db, "pins", response?.user?.uid), {
+        pins: []
+      })
       
       return {success: true, data: response?.user};
     } catch(e) {
