@@ -116,6 +116,10 @@ const CameraScreen = () => {
 
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Plant Identifier</Text>
+      <Text style={styles.subtitle}>
+        Upload a photo of a plant and let us identify it!
+      </Text>
       <TouchableOpacity style={styles.button} onPress={openCamera}>
         <Text style={styles.buttonText}>Open Camera</Text>
       </TouchableOpacity>
@@ -142,7 +146,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: "#E9F7EF"
+  },
+  title: {
+    fontSize: 28,
+    color: "#397004",
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  subtitle: {
+    fontSize: 15,
+    color: "#397004",
+    marginBottom: 20
   },
   button: {
     backgroundColor: "#397004",
