@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { StyleSheet, View, Button, Text } from 'react-native';
+import { StyleSheet, View, Button, Text, Modal, TextInput, Pressable } from 'react-native';
 import * as Location from "expo-location";
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 
 const SINGAPORE = {
   latitude: 1.32,
@@ -16,6 +16,8 @@ const SINGAPORE = {
 export default function Map() {
   const [mapRegion, setMapRegion] = useState(SINGAPORE);
   const [pins, setPins] = useState([]);
+  const [calloutInput, setCalloutInput] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -76,18 +78,25 @@ export default function Map() {
         latitude: mapRegion.latitude,
         longitude: mapRegion.longitude
       },
-      callout: 'This is a callout',
+      callout: calloutInput,
     }
     setPins((currentPins) => [...currentPins, newPin])
     savePin(newPin)
+    setCalloutInput('')
+    setModalVisible(false);
   }
 
   useEffect(() => {
-    userLocation()
-  }, [])
+    userLocation().then(() => {
+      if (user) {
+        fetchPins();
+      }
+    })
+  }, [user])
 
   return (
     <View style={styles.container}>
+      
       <MapView 
       style={styles.map}
       region={mapRegion} 
@@ -103,8 +112,32 @@ export default function Map() {
           </Marker>
         ))}
       </MapView>
+      
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible)
+        }}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TextInput
+              style={styles.input}
+              placeholder="Enter plant name"
+              onChangeText={text => setCalloutInput(text)}
+              value={calloutInput}
+            />
+            <Pressable onPress={addPin}>
+              <Text>Drop Pin</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
       <View>
-        <Button title="Drop Pin" onPress={addPin} disabled={isLoading}/>
+        <Button title="Drop Pin" onPress={() => setModalVisible(true)} disabled={isLoading}/>
       </View>
     </View>
   )
@@ -119,4 +152,30 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '80%',
   },
+  centeredView: {
+    flex: 1,
+    justifyContent: 'cemter',
+    alignItems: 'center',
+    marginTop: 22
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    }
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 20,
+    paddingHorizontal: 10,
+    width: 200
+  }
 });
