@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TextInput, Button, ActivityIndicator, Image, TouchableOpacity, Alert, KeyboardAvoidingView } from 'react-native';
 import React from 'react';
 import { useEffect, useState, useRef } from 'react';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { Link, Redirect, router } from "expo-router";
 import Search from './(tabs)/search';
 import { Ionicons } from "@expo/vector-icons";
@@ -16,13 +16,14 @@ export default function LogIn() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState(false);
+  const auth = getAuth();
 
   const {login} = useAuth();
 
   const emailRef = useRef("");
   const passwordRef = useRef("");
 
-  const handleLogin = async () =>{
+  const handleLogin = async () => {
     if(!emailRef.current || !passwordRef.current) {
       Alert.alert('Log in', "Log in failed.");
       return
@@ -35,6 +36,21 @@ export default function LogIn() {
       Alert.alert('Log In', response.msg);
     }
 
+  };
+
+  //forget password
+  const forgotPassword = () => {
+    if (!emailRef.current) {
+      Alert.alert("Please enter your email address first.");
+      console.log('email unknown');
+    } else {
+      sendPasswordResetEmail(auth, emailRef.current)
+      .then(() => {
+        Alert.alert("Password reset email sent!")
+      }).catch((error) => {
+        Alert.alert(error);
+      })
+    }
   }
   
   return (
@@ -90,6 +106,10 @@ export default function LogIn() {
         <Text style={styles.smallText}>Don't have an account? </Text>
         <Link href="sign-up" style={styles.smallButton}>Sign up</Link>
       </View>
+
+      <TouchableOpacity onPress={forgotPassword}>
+        <Text style={styles.smallButton}>Forgot password?</Text>
+      </TouchableOpacity>
         
     </KeyboardAvoidingView>
     
@@ -150,7 +170,8 @@ const styles = StyleSheet.create({
   signUpContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
+    marginBottom: 15
   },
   smallText: {
     fontSize: 15

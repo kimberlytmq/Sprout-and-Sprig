@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, ActivityIndicator } from 'react-native'
+import { View, Text, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView } from 'react-native'
 import React, { useState, useEffect, useRef } from 'react'
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
@@ -69,24 +69,31 @@ const Biodex = () => {
     <GestureHandlerRootView>
       <BottomSheetModalProvider>
         <SafeAreaView style={styles.container}>
-          <Text style={styles.title}>Biodex</Text>
-          <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
-          <FlatList 
-            data={images}
-            numColumns={2}
-            renderItem={({ item }) => {
-              return (
-                <View style={styles.card}>
-                  <TouchableOpacity onPress={() => openBottomSheet(item)}>
-                    <Image source={{uri: item}} style={styles.image}/>
-                  </TouchableOpacity>
-                  
-                </View>
-              )
-            }}
-            refreshing={refreshing}
-            onRefresh={handleRefresh}   
-          />
+            <Text style={styles.title}>Biodex</Text>
+            <TouchableOpacity style={styles.refreshButton} onPress={handleRefresh}>
+              <Ionicons
+                name={"refresh-outline"}
+                color={"#397004"}
+                size={24}
+              />
+            </TouchableOpacity>
+            <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
+            <FlatList 
+              data={images}
+              numColumns={2}
+              renderItem={({ item }) => {
+                return (
+                  <View style={styles.card}>
+                    <TouchableOpacity onPress={() => openBottomSheet(item)}>
+                      <Image source={{uri: item}} style={styles.image}/>
+                    </TouchableOpacity>
+                    
+                  </View>
+                )
+              }}
+              refreshing={refreshing}
+              onRefresh={handleRefresh}   
+            /> 
         </SafeAreaView>
         <BottomSheetModal
           ref={bottomSheetRef}
@@ -135,7 +142,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: "#397004",
     fontWeight: 'bold',
-    marginTop: 10
+    //marginTop: 10
   },
   subtitle: {
     fontSize: 15,
@@ -193,5 +200,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
+  },
+  refreshButton: {
+    position: 'absolute',
+    top: 65,
+    left: 350
   }
 });

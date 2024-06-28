@@ -126,10 +126,8 @@ const CameraScreen = () => {
       <TouchableOpacity style={styles.button} onPress={pickImage}>
         <Text style={styles.buttonText}>Pick an image</Text>
       </TouchableOpacity>
-      {/* {image &&  */}
       <Text style={styles.imageText}>Image: </Text>
       <Image source={{ uri: image }} style={styles.image} /> 
-      {/* } */}
       {image && image!=defaultImageUrl 
       && 
       <TouchableOpacity style={styles.button} onPress={uploadImage}>
@@ -176,7 +174,7 @@ const styles = StyleSheet.create({
     height: 200,
     marginBottom: 20,
     marginTop: 10,
-    borderWidth: 1
+    borderWidth: 1,
   },
   loadingContainer: {
     flex: 1,
