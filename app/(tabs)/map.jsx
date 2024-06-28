@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import MapView, { Marker, Callout } from 'react-native-maps';
-import { StyleSheet, View, Button, Text, Modal, TextInput, Pressable } from 'react-native';
+import { StyleSheet, View, Button, Text, Modal, TextInput, Pressable, TouchableOpacity } from 'react-native';
 import * as Location from "expo-location";
 import { getAuth } from 'firebase/auth';
-import { db } from '../../FirebaseConfig'
-import { doc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
+import { db } from '../../FirebaseConfig';
+import { doc, updateDoc, arrayUnion, getDoc, arrayRemove } from 'firebase/firestore';
 
 const SINGAPORE = {
   latitude: 1.32,
@@ -18,6 +18,7 @@ export default function Map() {
   const [pins, setPins] = useState([]);
   const [calloutInput, setCalloutInput] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPin, setSelectedPin] = useState(null);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -86,6 +87,56 @@ export default function Map() {
     setModalVisible(false);
   }
 
+  //update an existing pin
+  const updatePin = async (oldPin, newPin) => {
+    setIsLoading(true);
+    try {
+      const docRef = doc(db, "pins", user.uid);
+      await updateDoc(docRef, {
+        pins: arrayRemove(oldPin)
+      })
+      await updateDoc(docRef, {
+        pins: arrayUnion(newPin)
+      })
+      console.log("pin updated")
+    } catch (error) {
+      console.error('Error updating pin:', error)
+    } finally {
+      setIsLoading(false);
+    }
+  } 
+
+  //edit pin callout
+  const editPin = () => {
+    const updatedPin = {
+      ...selectedPin,
+      callout: calloutInput,
+    }
+    const updatedPins = pins.map(pin => pin === selectedPin ? updatedPin : pin)
+    setPins(updatedPins)
+    updatePin(selectedPin, updatedPin)
+    setCalloutInput('')
+    setModalVisible(false)
+  }
+
+  //delete a pin
+  const deletePin = async (pin) => {
+    setIsLoading(true)
+    try {
+      const docRef = doc(db, "pins", user.uid)
+      await updateDoc(docRef, {
+        pins: arrayRemove(pin)
+      })
+      console.log("pin deleted")
+      setPins((currentPins) => currentPins.filter((p) => p !== pin))
+    } catch (error) {
+      console.error('Error deleting pin:', error)
+    } finally {
+      setIsLoading(false)
+      setModalVisible(false)
+    }
+  }
+
   useEffect(() => {
     userLocation().then(() => {
       if (user) {
@@ -104,9 +155,13 @@ export default function Map() {
       >
         {pins.map((pin, index) => (
           <Marker key={index} coordinate={pin.coordinate}>
-            <Callout>
+            <Callout onPress={() => {
+              setSelectedPin(pin)
+              setCalloutInput(pin.callout)
+              setModalVisible(true)
+            }}>
               <View>
-                <Text>{pin.callout}</Text>
+                <Text style={styles.callout}>{pin.callout}</Text>
               </View>
             </Callout>
           </Marker>
@@ -129,16 +184,30 @@ export default function Map() {
               onChangeText={text => setCalloutInput(text)}
               value={calloutInput}
             />
-            <Pressable onPress={addPin}>
-              <Text>Drop Pin</Text>
+            <Pressable style={styles.smallButton} onPress={selectedPin ? editPin : addPin}>
+              <Text style={styles.smallButtonText}>{selectedPin ? "Edit Pin" : "Drop Pin"}</Text>
             </Pressable>
+            {selectedPin && (
+              <Pressable style={styles.smallButton} onPress={() => deletePin(selectedPin)}>
+                <Text style={styles.smallButtonText}>Delete Pin</Text>
+              </Pressable>
+            )}
           </View>
         </View>
       </Modal>
 
-      <View>
-        <Button title="Drop Pin" onPress={() => setModalVisible(true)} disabled={isLoading}/>
-      </View>
+
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={() => {
+          setSelectedPin(null)
+          setCalloutInput('')
+          setModalVisible(true)
+        }}
+        disabled={isLoading} >
+        <Text style={styles.buttonText} >Drop Pin</Text>
+      </TouchableOpacity> 
+
     </View>
   )
   
@@ -147,10 +216,12 @@ export default function Map() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#E9F7EF",
+    alignItems: 'center',
   },
   map: {
     width: '100%',
-    height: '80%',
+    height: '75%',
   },
   centeredView: {
     flex: 1,
@@ -169,6 +240,38 @@ const styles = StyleSheet.create({
       width: 0,
       height: 2
     }
+  },
+  callout: {
+    color: "#397004",
+    fontWeight: "bold"
+  },
+  button: {
+    backgroundColor: "#397004",
+    padding: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 100,
+    width: 150,
+    marginBottom: 15,
+    marginTop: 15,
+    marginLeft: 10
+  },
+  buttonText: {
+    fontWeight: "bold",
+    fontSize: 18,
+    color: "white"
+  },
+  smallButton: {
+    backgroundColor: "#D4EFDF",
+    padding: 10,
+    borderRadius: 15,
+    width: 100,
+    justifyContent: 'center',
+    alignItems: 'center',
+    margin: 5
+  },
+  smallButtonText: {
+    color: "#397004",
   },
   input: {
     height: 40,
