@@ -153,7 +153,7 @@ export default Search
 
 const styles = StyleSheet.create({
   container: {
-    //justifyContent: "center",
+    justifyContent: "center",
     alignItems: "center",
     flex: 1
   },
