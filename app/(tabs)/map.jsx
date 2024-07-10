@@ -19,6 +19,7 @@ export default function Map() {
   const [calloutInput, setCalloutInput] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedPin, setSelectedPin] = useState(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
 
   const auth = getAuth();
   const user = auth.currentUser;
@@ -37,6 +38,10 @@ export default function Map() {
       longitude: location.coords.longitude,
       latitudeDelta: 0.005,
       longitudeDelta: 0.005
+    })
+    setCurrentLocation({
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
     })
     console.log(location.coords.latitude, location.coords.longitude)
   }
@@ -81,10 +86,11 @@ export default function Map() {
       },
       callout: calloutInput,
     }
-    setPins((currentPins) => [...currentPins, newPin])
-    savePin(newPin)
-    setCalloutInput('')
+    setPins((currentPins) => [...currentPins, newPin]);
+    savePin(newPin);
+    setCalloutInput('');
     setModalVisible(false);
+    setCurrentLocation(null);
   }
 
   //update an existing pin
@@ -153,6 +159,12 @@ export default function Map() {
       region={mapRegion} 
       onRegionChangeComplete={setMapRegion}
       >
+        {currentLocation && (
+          <Marker
+            coordinate={currentLocation}
+            pinColor="blue"
+          />
+        )}
         {pins.map((pin, index) => (
           <Marker key={index} coordinate={pin.coordinate}>
             <Callout onPress={() => {
