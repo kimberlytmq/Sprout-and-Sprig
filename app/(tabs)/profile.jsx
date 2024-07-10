@@ -9,13 +9,18 @@ import { useAuth } from '../../context/authContext';
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 
+const achievementsCriteria = [
+  { id: 1, description: "Saved 5 pins", check: (pins) => pins.length >= 5}
+]
 
 const Profile = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [profilePicture, setProfilePicture] = useState('https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png');
+  const [achievements, setAchievements] = useState([])
   const auth = getAuth();
   const user = auth.currentUser;
+
 
   useEffect(() => {
     const fetchUsername = async () => {
@@ -77,6 +82,53 @@ const Profile = () => {
     fetchProfilePicture();
   }, [user]);
 
+  /*
+  useEffect(() => {
+    const fetchAchievements = async () => {
+      try {
+        if (user) {
+          const achievemenstDoc = doc(db, 'achievements', user.uid);
+          const docSnap = await getDoc(achievementsDoc);
+          if (docSnap.exists()) {
+            setAchievements(docSnap.data().achievements || [])
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchAchievements();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchPinsForAchievements = async () => {
+      try {
+        if (user) {
+          const pinsDoc = doc(db, 'pins', user.uid);
+          const docSnap = await getDoc(pinsDoc);
+          if (docSnap.exists()) {
+            checkAchievements(docSnap.data().pins);
+          } else {
+            console.log('No such document!');
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching document:', error);
+      }
+    };
+
+    fetchPinsForAchievements();
+  }, [user]);
+
+  
+  const checkAchievements = async (pins) => {
+    const newAchievements = [];
+    for (const achievement of achievementsCriteria)
+  }
+  */
 
   const { logout } = useAuth();
   const handleLogout = async ()=>{
