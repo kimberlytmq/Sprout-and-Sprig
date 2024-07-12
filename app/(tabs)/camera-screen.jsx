@@ -1,10 +1,12 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, SafeAreaView, Alert } from 'react-native'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
 import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
 import { PLANT_API_KEY } from '../../config';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 
 const CameraScreen = () => {
@@ -17,7 +19,10 @@ const CameraScreen = () => {
   const user = auth.currentUser;
   const [isLoading, setIsLoading] = useState(false);
   const axios = require("axios").default;
-  const [plantData, setPlantData] = useState(null);
+  const [plantData, setPlantData] = useState('');
+  const bottomSheetRef = useRef(null);
+  const snapPoints = ["90%"];
+  const [identifiedPlant, setIdentifiedPlant] = useState('');
 
 
   if (!cameraPermission) {
@@ -112,6 +117,10 @@ const CameraScreen = () => {
     Alert.alert("Image added to Biodex!");
   };
 
+  const clearImage = () => {
+    setImage(defaultImageUrl);
+  }
+
   const identifyPlant = async () => {
     const data = {
       images: ["data:image/jpeg;base64," + imageBase],
@@ -136,10 +145,10 @@ const CameraScreen = () => {
       setPlantData(response.data);
       console.log(response.data);
       setIsLoading(false);
-      // props.navigation.navigate("ChoosePlant", {
-      //   data: plantData,
-      //   resetImage: removePic,
-      // });
+      setIdentifiedPlant(plantData.suggestions[0]);
+      bottomSheetRef.current?.present();
+      //console.log(plantData.suggestions[0].plant_details);
+
     } catch (err) {
       console.log(err);
     }
@@ -156,34 +165,67 @@ const CameraScreen = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Plant Identifier</Text>
-      <Text style={styles.subtitle}>
-        Upload a photo of a plant and let us identify it!
-      </Text>
-      <TouchableOpacity style={styles.button} onPress={openCamera}>
-        <Text style={styles.buttonText}>Open Camera</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.button} onPress={pickImage}>
-        <Text style={styles.buttonText}>Pick an image</Text>
-      </TouchableOpacity>
-      <Text style={styles.imageText}>Image: </Text>
-      <Image source={{ uri: image }} style={styles.image} /> 
-      {image && image!=defaultImageUrl 
-      && 
-      <TouchableOpacity style={styles.button} onPress={uploadImage}>
-        <Text style={styles.buttonText}>Add image to Biodex</Text>
-      </TouchableOpacity>
-      &&
-      <TouchableOpacity style={styles.button} onPress={identifyPlant}>
-        <Text style={styles.buttonText}>Identify plant</Text>
-      </TouchableOpacity>
-      }
+    <GestureHandlerRootView>
+      <BottomSheetModalProvider>
+        <View style={styles.container}>
+        <Text style={styles.title}>Plant Identifier</Text>
+        <Text style={styles.subtitle}>
+          Upload a photo of a plant and let us identify it!
+        </Text>
+        <TouchableOpacity style={styles.button} onPress={openCamera}>
+          <Text style={styles.buttonText}>Open Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={pickImage}>
+          <Text style={styles.buttonText}>Pick an image</Text>
+        </TouchableOpacity>
+        <Text style={styles.imageText}>Image: </Text>
+        <Image source={{ uri: image }} style={styles.image} /> 
+        {image && image!=defaultImageUrl 
+        &&
+        <View style={styles.buttonsContainer}>
+          <TouchableOpacity style={styles.button} onPress={identifyPlant}>
+            <Text style={styles.buttonText}>Identify plant</Text>
+          </TouchableOpacity>
 
-      <Text>{plantData?.suggestions[0].plant_name}</Text>
-      
-      
-    </View>
+          <TouchableOpacity style={styles.button} onPress={clearImage}>
+            <Text style={styles.buttonText}>Clear</Text>
+          </TouchableOpacity>
+          
+        </View>
+        }
+
+        <View>
+
+        </View>
+
+        <BottomSheetModal
+          ref={bottomSheetRef} 
+          snapPoints={snapPoints}
+          index={0}
+        >
+
+          <View style={styles.bottomSheetContainer}>
+            <Image 
+              source={{uri: identifiedPlant.images[0].url}}
+              style={styles.plantImage}
+            />
+            <Text style={styles.plantNameText}>{plantData.suggestions[0].plant_details.common_names[0]}</Text>
+            <Text style={styles.plantDetailsText}>Scientific name: {plantData.suggestions[0].plant_name}</Text>
+
+            <TouchableOpacity style={styles.button} onPress={uploadImage}>
+              <Text style={styles.buttonText}>Add image to Biodex</Text>
+            </TouchableOpacity>
+
+          </View>
+
+        </BottomSheetModal>
+        
+        
+      </View>
+
+      </BottomSheetModalProvider>
+    </GestureHandlerRootView>
+    
   )
 }
 
@@ -211,7 +253,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#397004",
     padding: 10,
     borderRadius: 10,
-    marginBottom: 20
+    marginBottom: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
@@ -235,5 +279,31 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginTop: 20
-  }
+  },
+  bottomSheetContainer: {
+    backgroundColor: "#E9F7EF",
+    flex: 1,
+    alignItems: 'center',
+  },
+  plantImage: {
+    width: 250,
+    height: 250,
+    marginTop: 30,
+    marginBottom: 20
+  },
+  plantNameText: {
+    color: "#145A32",
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginBottom: 10
+  },
+  buttonsContainer: {
+    flexDirection: 'row',
+    columnGap: 20
+  },
+  plantDetailsText: {
+    color: "#145A32",
+    fontSize: 16,
+    marginBottom: 20
+  },
 })
