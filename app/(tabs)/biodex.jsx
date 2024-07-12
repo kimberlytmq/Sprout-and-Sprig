@@ -3,27 +3,27 @@ import React, { useState, useEffect, useRef } from 'react'
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
 import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
-import plantSpecies from '../../context/species_data.json';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Ionicons } from "@expo/vector-icons";
 
 const Biodex = () => {
-  const [images, setImages] = useState('');
+  const [plants, setPlants] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const auth = getAuth();
   const user = auth.currentUser;
   const bottomSheetRef = useRef(null);
+  const moreLikeThisSheetRef = useRef(null);
   const snapPoints = ['30%'];
   const [currentPlant, setCurrentPlant] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  //get plant data from Firebase
   const fetchImages = async () => {
-    const docRef = doc(db, "images", user.uid);
+    const docRef = doc(db, "plants", user.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      setImages(docSnap.data().images);
-      //console.log("User's gallery: ", images);
+      setPlants(docSnap.data().plants || []);
     } else {
       console.log("No such document");
     }
@@ -45,15 +45,19 @@ const Biodex = () => {
     bottomSheetRef.current?.present();
   }
 
-  const removeImage = async () => { 
+  const removePlant = async () => { 
       setIsLoading(true);
       const docRef = doc(db, "images", user.uid);
       await updateDoc(docRef, {
-        images: arrayRemove(currentPlant)
+        plants: arrayRemove(currentPlant)
       });
       console.log("plant removed from biodex")
-      fetchImages();
+      fetchPlants();
       setIsLoading(false);
+  };
+
+  const moreLikeThis = async () => {
+    moreLikeThisSheetRef.current?.present();
   };
 
   if (isLoading) {
@@ -79,18 +83,20 @@ const Biodex = () => {
             </TouchableOpacity>
             <Text style={styles.subtitle}>A collection of the plants you spotted!</Text>
             <FlatList 
-              data={images}
+              data={plants}
               numColumns={2}
               renderItem={({ item }) => {
                 return (
                   <View style={styles.card}>
                     <TouchableOpacity onPress={() => openBottomSheet(item)}>
-                      <Image source={{uri: item}} style={styles.image}/>
+                      <Image source={{uri: item.image}} style={styles.image}/>
+                      <Text style={styles.plantText}>{item.name}</Text>
                     </TouchableOpacity>
                     
                   </View>
                 )
               }}
+              keyExtractor={(item, index) => index.toString()}
               refreshing={refreshing}
               onRefresh={handleRefresh}   
             /> 
@@ -101,16 +107,19 @@ const Biodex = () => {
           index={0}
         >
           <View style={styles.bottomSheetContainer}>
-            <View style={styles.buttonContainer}>
-              <Ionicons
-                name={"information-circle-outline"}
-                color={"#397004"}
-                size={26}
-              />
-              <Text style={styles.buttonText}>Learn more</Text>
-            </View>
 
-            <TouchableOpacity onPress={removeImage}>
+            <TouchableOpacity onPress={moreLikeThis}>
+              <View style={styles.buttonContainer}>
+                <Ionicons
+                  name={"information-circle-outline"}
+                  color={"#397004"}
+                  size={26}
+                />
+                <Text style={styles.buttonText}>More like this</Text>
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={removePlant}>
               <View style={styles.buttonContainer}>
                 <Ionicons
                   name={"trash-outline"}
@@ -124,6 +133,17 @@ const Biodex = () => {
           </View>
 
         </BottomSheetModal>
+
+        <BottomSheetModal
+          ref={moreLikeThisSheetRef}
+          snapPoints={(['90%'])}
+          index={0}
+        >
+          <View>
+            <Text>More plants!</Text>
+          </View>
+        </BottomSheetModal>
+
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
    
@@ -166,6 +186,12 @@ const styles = StyleSheet.create({
     // marginRight: 5,
     // marginTop: 5,
     // marginBottom: 5
+  },
+  plantText: {
+    fontSize: 15,
+    padding: 5,
+    justifyContent: 'center',
+    color: '#397004'
   },
   textContainer: {
     justifyContent: 'center',

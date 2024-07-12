@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
-import { doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { doc, updateDoc, arrayUnion, addDoc } from 'firebase/firestore';
 import { PLANT_API_KEY } from '../../config';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
@@ -13,6 +13,7 @@ const CameraScreen = () => {
   const defaultImageUrl = 'https://storage.googleapis.com/proudcity/mebanenc/uploads/2021/03/placeholder-image.png';
   const [image, setImage] = useState(defaultImageUrl);
   const [imageBase, setImageBase] = useState(null);
+  const [plants, setPlants] = useState([]);
   const [cameraPermission, requestCameraPermission] = ImagePicker.useCameraPermissions();
   const [mediaLibraryPermission, requestMediaLibraryPermission] = ImagePicker.useMediaLibraryPermissions();
   const auth = getAuth();
@@ -105,17 +106,32 @@ const CameraScreen = () => {
     }
   };
 
-  const uploadImage = async () => {
-    setIsLoading(true);
-    const docRef = doc(db, "images", user.uid);
-    await updateDoc(docRef, {
-      images: arrayUnion(image)
-    });
-    console.log("image added to biodex")
-    setImage(defaultImageUrl);
-    setIsLoading(false);
-    Alert.alert("Image added to Biodex!");
-  };
+    //save plant to database
+    const savePlant = async (plant) => {
+      setIsLoading(true);
+      try {
+        const docRef = doc(db, "plants", user.uid);
+        await updateDoc(docRef, {
+          plants: arrayUnion(plant)
+        });
+        console.log("plant added")
+      } catch (error) {
+        console.error('Error saving plant:', error)
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    //add plant and save to Firestore
+    const addPlant = () => {
+      const newPlant = {
+        name: identifiedPlant.plant_details?.common_names[0] || 'Unknown Plant',
+        image: image
+      }
+      setPlants((currentPlants) => [...currentPlants, newPlant]);
+      savePlant(newPlant);
+    }
+
 
   const clearImage = () => {
     setImage(defaultImageUrl);
@@ -228,7 +244,7 @@ const CameraScreen = () => {
             { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
               ) : (
                 <>
-                <TouchableOpacity style={styles.button} onPress={uploadImage}>
+                <TouchableOpacity style={styles.button} onPress={addPlant}>
                     <Text style={styles.buttonText}>Add image to Biodex</Text>
                   </TouchableOpacity>  
                 </>

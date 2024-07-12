@@ -12,9 +12,11 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 
 
 const achievementsCriteria = [
-  { id: 1, description: "Saved 5 plant pins", check: (pins) => pins.length >= 5},
-  { id: 2, description: "Saved 10 plant pins", check: (pins) => pins.length >= 10},
-  { id: 3, description: "Saved 20 plant pins", check: (pins) => pins.length >= 20}
+  { id: 1, description: "Saved your first plant pin on the map", check: (pins) => pins.length >= 1},
+  { id: 2, description: "Saved 5 plant pins on the map", check: (pins) => pins.length >= 5},
+  { id: 3, description: "Saved 10 plant pins on the map", check: (pins) => pins.length >= 10},
+  { id: 4, description: "Saved your first plant to the Biodex", check: (plant) => plant.length >= 1}
+  
 ]
 
 
@@ -89,32 +91,8 @@ const Profile = () => {
 
     fetchProfilePicture();
   }, [user]);
-
-  // fetch achievements from firebase
-
-  /*
-  useEffect(() => {
-    const fetchAchievements = async () => {
-      try {
-        if (user) {
-          const achievementsDoc = doc(db, 'achievements', user.uid);
-          const docSnap = await getDoc(achievementsDoc);
-          if (docSnap.exists()) {
-            setAchievements(docSnap.data().achievements || [])
-          } else {
-            console.log('No such document!');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching document:', error);
-      }
-    };
-
-    fetchAchievements();
-  }, [user]);
-  */
-
   
+  // fetch achievements from Firestore
   useEffect(() => {
     if (user) {
       const achievementsDoc = doc(db, 'achievements', user.uid);
@@ -132,28 +110,6 @@ const Profile = () => {
   
 
   // access pins from firebase
-  /*
-  useEffect(() => {
-    const fetchPinsForAchievements = async () => {
-      try {
-        if (user) {
-          const pinsDoc = doc(db, 'pins', user.uid);
-          const docSnap = await getDoc(pinsDoc);
-          if (docSnap.exists()) {
-            checkAchievements(docSnap.data().pins);
-          } else {
-            console.log('No such document!');
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching document:', error);
-      }
-    };
-
-    fetchPinsForAchievements();
-  }, [user]);
-  */
-
   useEffect(() => {
     if (user) {
         const pinsDoc = doc(db, 'pins', user.uid);
@@ -169,6 +125,8 @@ const Profile = () => {
         return () => unsubscribe();
     }
   }, [user]);
+
+  // access plants from biodex
 
   // check if achievements should be given
   const checkAchievements = async (pins) => {

@@ -58,8 +58,8 @@ export const AuthContextProvider = ({children}) => {
         userId: response?.user?.uid,
       })
 
-      await setDoc(doc(db, "images", response?.user?.uid), {
-        images: []
+      await setDoc(doc(db, "plants", response?.user?.uid), {
+        plants: []
       })
 
       await setDoc(doc(db, "pins", response?.user?.uid), {
