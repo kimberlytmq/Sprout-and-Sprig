@@ -45,6 +45,7 @@ const Biodex = () => {
     bottomSheetRef.current?.present();
   }
 
+  /*
   const removePlant = async () => { 
       setIsLoading(true);
       const docRef = doc(db, "images", user.uid);
@@ -55,6 +56,24 @@ const Biodex = () => {
       fetchPlants();
       setIsLoading(false);
   };
+  */
+
+   //delete a plant
+   const removePlant = async (plant) => {
+    setIsLoading(true)
+    try {
+      const docRef = doc(db, "plants", user.uid)
+      await updateDoc(docRef, {
+        plants: arrayRemove(plant)
+      })
+      console.log("plant deleted")
+      setPlants((currentPlant) => currentPlant.filter((p) => p !== pin))
+    } catch (error) {
+      console.error('Error deleting pin:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const moreLikeThis = async () => {
     moreLikeThisSheetRef.current?.present();

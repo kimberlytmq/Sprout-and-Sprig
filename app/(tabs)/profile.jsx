@@ -12,11 +12,13 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 
 
 const achievementsCriteria = [
-  { id: 1, description: "Saved your first plant pin on the map", check: (pins) => pins.length >= 1},
-  { id: 2, description: "Saved 5 plant pins on the map", check: (pins) => pins.length >= 5},
-  { id: 3, description: "Saved 10 plant pins on the map", check: (pins) => pins.length >= 10},
-  { id: 4, description: "Saved your first plant to the Biodex", check: (plant) => plant.length >= 1}
-  
+  { id: 1, description: "Saved your first plant pin on the map", check: (pins, plants) => pins.length >= 1},
+  { id: 2, description: "Saved 5 plant pins on the map", check: (pins, plants) => pins.length >= 5},
+  { id: 3, description: "Saved 10 plant pins on the map", check: (pins, plants) => pins.length >= 10},
+  { id: 4, description: "Saved your first plant to the Biodex", check: (pins, plants) => plants.length >= 1},
+  { id: 5, description: "Saved 5 plants to the Biodex", check: (pins, plants) => plants.length >= 5},
+  { id: 6, description: "Saved 10 plants to the Biodex", check: (pins, plants) => plants.length >= 10}
+
 ]
 
 
@@ -109,13 +111,39 @@ const Profile = () => {
   }, [user]);
   
 
-  // access pins from firebase
+  // access pins and plants from firebase
   useEffect(() => {
     if (user) {
-        const pinsDoc = doc(db, 'pins', user.uid);
-        const unsubscribe = onSnapshot(pinsDoc, (doc) => {
+      const pinsDoc = doc(db, 'pins', user.uid);
+      const unsubscribePins = onSnapshot(pinsDoc, (pinsSnapshot) => {
+        if (pinsSnapshot.exists()) {
+          const pins = pinsSnapshot.data().pins;
+          const plantsDoc = doc(db, 'plants', user.uid);
+          const unsubscribePlants = onSnapshot(plantsDoc, (plantSnapshot) => {
+            if (plantSnapshot.exists()) {
+              const plants = plantSnapshot.data().plants;
+              checkAchievements(pins, plants);
+            } else {
+              console.log('No such document for plants!');
+            }
+          });
+        } else {
+          console.log('No such document for pins!');
+        }
+      });
+
+      // Cleanup the listener on component unmount
+      return () => unsubscribePins();
+    }
+  }, [user]);
+
+  /*
+  useEffect(() => {
+    if (user) {
+        const plantsDoc = doc(db, 'plants', user.uid);
+        const unsubscribe = onSnapshot(plantsDoc, (doc) => {
             if (doc.exists()) {
-                checkAchievements(doc.data().pins);
+                checkAchievements(doc.data().plants);
             } else {
                 console.log('No such document!');
             }
@@ -125,14 +153,13 @@ const Profile = () => {
         return () => unsubscribe();
     }
   }, [user]);
-
-  // access plants from biodex
+  */
 
   // check if achievements should be given
-  const checkAchievements = async (pins) => {
+  const checkAchievements = async (pins, plants) => {
     const newAchievements = [];
     for (const achievement of achievementsCriteria) {
-      if (achievement.check(pins) && !achievements.some(a => a.id === achievement.id)) {
+      if (achievement.check(pins, plants) && !achievements.some(a => a.id === achievement.id)) {
         newAchievements.push({ id: achievement.id, description: achievement.description });
       }
     }
