@@ -2,16 +2,21 @@ import { View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native'
 import { Link } from "expo-router";
 import React, { useEffect, useState } from 'react'
 import { db } from '../../FirebaseConfig'
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 import { BottomTabBarHeightCallbackContext } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../../context/authContext';
 import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { SimpleLineIcons } from '@expo/vector-icons';
+
 
 const achievementsCriteria = [
-  { id: 1, description: "Saved 5 pins", check: (pins) => pins.length >= 5}
+  { id: 1, description: "Saved 5 plant pins", check: (pins) => pins.length >= 5},
+  { id: 2, description: "Saved 10 plant pins", check: (pins) => pins.length >= 10},
+  { id: 3, description: "Saved 20 plant pins", check: (pins) => pins.length >= 20}
 ]
+
 
 const Profile = () => {
   const [username, setUsername] = useState('');
@@ -22,6 +27,7 @@ const Profile = () => {
   const user = auth.currentUser;
 
 
+  // fetch username from firebase
   useEffect(() => {
     const fetchUsername = async () => {
       try {
@@ -42,6 +48,7 @@ const Profile = () => {
     fetchUsername();
   }, [user]);
 
+  // fetch email from firebase
   useEffect(() => {
     const fetchEmail = async () => {
       try {
@@ -62,6 +69,7 @@ const Profile = () => {
     fetchEmail();
   }, [user]);
 
+  // fetch profile picture from firebase
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
@@ -82,12 +90,14 @@ const Profile = () => {
     fetchProfilePicture();
   }, [user]);
 
+  // fetch achievements from firebase
+
   /*
   useEffect(() => {
     const fetchAchievements = async () => {
       try {
         if (user) {
-          const achievemenstDoc = doc(db, 'achievements', user.uid);
+          const achievementsDoc = doc(db, 'achievements', user.uid);
           const docSnap = await getDoc(achievementsDoc);
           if (docSnap.exists()) {
             setAchievements(docSnap.data().achievements || [])
@@ -102,7 +112,27 @@ const Profile = () => {
 
     fetchAchievements();
   }, [user]);
+  */
 
+  
+  useEffect(() => {
+    if (user) {
+      const achievementsDoc = doc(db, 'achievements', user.uid);
+      const unsubscribe = onSnapshot(achievementsDoc, (doc) => {
+        if (doc.exists()) {
+          setAchievements(doc.data().achievements || []);
+        } else {
+          console.log('No such document!');
+        }
+      });
+  
+      return () => unsubscribe();
+    }
+  }, [user]);
+  
+
+  // access pins from firebase
+  /*
   useEffect(() => {
     const fetchPinsForAchievements = async () => {
       try {
@@ -122,22 +152,58 @@ const Profile = () => {
 
     fetchPinsForAchievements();
   }, [user]);
+  */
 
-  
+  useEffect(() => {
+    if (user) {
+        const pinsDoc = doc(db, 'pins', user.uid);
+        const unsubscribe = onSnapshot(pinsDoc, (doc) => {
+            if (doc.exists()) {
+                checkAchievements(doc.data().pins);
+            } else {
+                console.log('No such document!');
+            }
+        });
+
+        // Cleanup the listener on component unmount
+        return () => unsubscribe();
+    }
+  }, [user]);
+
+  // check if achievements should be given
   const checkAchievements = async (pins) => {
     const newAchievements = [];
-    for (const achievement of achievementsCriteria)
+    for (const achievement of achievementsCriteria) {
+      if (achievement.check(pins) && !achievements.some(a => a.id === achievement.id)) {
+        newAchievements.push({ id: achievement.id, description: achievement.description });
+      }
+    }
+    if (newAchievements.length > 0) {
+      const updatedAchievements = [...achievements, ...newAchievements]
+      setAchievements(updatedAchievements);
+      await updateAchievements(updatedAchievements);
+    }
   }
-  */
+  
+  // update achievements
+  const updateAchievements = async (newAchievements) => {
+    try {
+      const achievementsDoc = doc(db, 'achievements', user.uid);
+      await updateDoc(achievementsDoc, {achievements: newAchievements});
+      console.log('Achievements updated in Firestore')
+    } catch (error) {
+      console.error('Error updating achievements: ', error);
+    }
+  };
 
   const { logout } = useAuth();
   const handleLogout = async ()=>{
     await logout();
   }
-  
 
   return (
     <View style={styles.container}>
+
       <View style={styles.header}>
           <Image
             source={{ uri: profilePicture }}
@@ -159,9 +225,17 @@ const Profile = () => {
           </TouchableOpacity>
         </Link>
         
-        
       </View>
       <Text style={styles.subtitle}>Achievements</Text>
+      <View style={styles.achievements}>
+        {achievements.map((achievement) => (
+          <View key={achievement.id} style={styles.achievementContainer}>
+            <SimpleLineIcons name="badge" size={24} color='#397004' marginRight={10}/>
+            <Text style={styles.achievementText}>{achievement.description}</Text>
+          </View>
+        ))}
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={handleLogout} >
         <Text style={styles.buttonText} >Logout</Text>
       </TouchableOpacity> 
@@ -198,7 +272,6 @@ const styles = StyleSheet.create({
     color: '#397004',
     marginTop: 15,
     marginLeft: 10,
-    marginBottom: 15
   },
   button: {
     backgroundColor: "#397004",
@@ -241,7 +314,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   editProfileText: {
-    color: "#397004",
+    color: '#397004',
     fontWeight: 'bold'
   },
   cameraContainer: {
@@ -249,4 +322,17 @@ const styles = StyleSheet.create({
     marginTop: 80,
     marginLeft: 70
   },
+  achievements: {
+    padding: 15
+  },
+  achievementContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10
+  },
+  achievementText: {
+    fontSize: 18,
+    color: '#397004',
+    marginBottom: 5,
+  }
 });
