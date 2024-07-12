@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, SafeAreaView, Alert } from 'react-native'
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, SafeAreaView, Alert, ScrollView } from 'react-native'
 import React, { useState, useRef } from 'react'
 import * as ImagePicker from 'expo-image-picker';
 import { getAuth } from 'firebase/auth';
@@ -129,7 +129,6 @@ const CameraScreen = () => {
         "common_names",
         "taxonomy",
         "url",
-        "description",
         "wiki_description",
         "wiki_image",
       ],
@@ -145,8 +144,7 @@ const CameraScreen = () => {
       setPlantData(response.data);
       console.log(response.data);
       setIsLoading(false);
-      setIdentifiedPlant(plantData.suggestions[0]);
-      bottomSheetRef.current?.present();
+      openBottomSheet(response.data);
       //console.log(plantData.suggestions[0].plant_details);
 
     } catch (err) {
@@ -154,15 +152,21 @@ const CameraScreen = () => {
     }
   };
 
-
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large"/>
-        <Text>Loading</Text>
-      </SafeAreaView>
-    )
+  const openBottomSheet = (data) => {
+    setIdentifiedPlant(data.suggestions[0]);
+    bottomSheetRef.current?.present();
+    //console.log(plantData);
   }
+
+
+  // if (isLoading) {
+  //   return (
+  //     <SafeAreaView style={styles.loadingContainer}>
+  //       <ActivityIndicator size="large"/>
+  //       <Text>Loading</Text>
+  //     </SafeAreaView>
+  //   )
+  // }
 
   return (
     <GestureHandlerRootView>
@@ -183,10 +187,15 @@ const CameraScreen = () => {
         {image && image!=defaultImageUrl 
         &&
         <View style={styles.buttonsContainer}>
+          { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
+        ) : (
+          <>
           <TouchableOpacity style={styles.button} onPress={identifyPlant}>
             <Text style={styles.buttonText}>Identify plant</Text>
           </TouchableOpacity>
-
+          </>
+        )
+      }
           <TouchableOpacity style={styles.button} onPress={clearImage}>
             <Text style={styles.buttonText}>Clear</Text>
           </TouchableOpacity>
@@ -204,22 +213,32 @@ const CameraScreen = () => {
           index={0}
         >
 
-          <View style={styles.bottomSheetContainer}>
+          {plantData && 
+            <ScrollView contentContainerStyle={styles.bottomSheetContainer}>
             <Image 
-              source={{uri: identifiedPlant.images[0].url}}
+              source={{ uri: identifiedPlant.plant_details?.wiki_image
+                        ? identifiedPlant.plant_details.wiki_image.value
+                        : plantData.images[0].url }}
               style={styles.plantImage}
             />
-            <Text style={styles.plantNameText}>{plantData.suggestions[0].plant_details.common_names[0]}</Text>
-            <Text style={styles.plantDetailsText}>Scientific name: {plantData.suggestions[0].plant_name}</Text>
+            <Text style={styles.plantNameText}>{identifiedPlant.plant_details?.common_names[0]}</Text>
+            <Text style={styles.plantDetailsText}>Scientific name: {identifiedPlant.plant_name}</Text>
+            <Text style={styles.plantDetailsText}>{identifiedPlant.plant_details?.wiki_description.value}</Text>
 
-            <TouchableOpacity style={styles.button} onPress={uploadImage}>
-              <Text style={styles.buttonText}>Add image to Biodex</Text>
-            </TouchableOpacity>
+            { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
+              ) : (
+                <>
+                <TouchableOpacity style={styles.button} onPress={uploadImage}>
+                    <Text style={styles.buttonText}>Add image to Biodex</Text>
+                  </TouchableOpacity>  
+                </>
+              )
+            }
 
-          </View>
+          </ScrollView>
+          }
 
         </BottomSheetModal>
-        
         
       </View>
 
@@ -289,11 +308,11 @@ const styles = StyleSheet.create({
     width: 250,
     height: 250,
     marginTop: 30,
-    marginBottom: 20
+    marginBottom: 15
   },
   plantNameText: {
     color: "#145A32",
-    fontSize: 25,
+    fontSize: 30,
     fontWeight: 'bold',
     marginBottom: 10
   },
@@ -304,6 +323,8 @@ const styles = StyleSheet.create({
   plantDetailsText: {
     color: "#145A32",
     fontSize: 16,
-    marginBottom: 20
+    marginBottom: 20,
+    marginLeft: 10,
+    marginRight: 10
   },
 })
