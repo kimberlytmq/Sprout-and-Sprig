@@ -6,6 +6,10 @@ import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import { Ionicons } from "@expo/vector-icons";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const apiKey = process.env.EXPO_PUBLIC_GOOGLE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
 
 const Biodex = () => {
   const [plants, setPlants] = useState([]);
@@ -17,6 +21,19 @@ const Biodex = () => {
   const snapPoints = ['30%'];
   const [currentPlant, setCurrentPlant] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [similarPlants, setSimilarPlants] = useState([]);
+
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
+
+  const generationConfig = {
+    temperature: 1,
+    topP: 0.95,
+    topK: 64,
+    maxOutputTokens: 8192,
+    responseMimeType: "application/json",
+  };
 
   //get plant data from Firebase
   const fetchImages = async () => {
@@ -45,19 +62,6 @@ const Biodex = () => {
     bottomSheetRef.current?.present();
   }
 
-  /*
-  const removePlant = async () => { 
-      setIsLoading(true);
-      const docRef = doc(db, "images", user.uid);
-      await updateDoc(docRef, {
-        plants: arrayRemove(currentPlant)
-      });
-      console.log("plant removed from biodex")
-      fetchPlants();
-      setIsLoading(false);
-  };
-  */
-
    //delete a plant
    const removePlant = async (plant) => {
     setIsLoading(true)
@@ -75,8 +79,31 @@ const Biodex = () => {
     }
   }
 
+  // AI to generate similar plants
+
   const moreLikeThis = async () => {
-    moreLikeThisSheetRef.current?.present();
+    setIsLoading(true);
+    try {
+      const chatSession = model.startChat({
+        generationConfig,
+      // safetySettings: Adjust safety settings
+      // See https://ai.google.dev/gemini-api/docs/safety-settings
+        history: [
+        ],
+      });
+      const result = await chatSession.sendMessage(
+        "Name 3 plants similar to ${currentPlant.name} and include an image and a short description for each JSON format."
+      );
+      const similarPlantsData = JSON.parse(result.response.text());
+      setSimilarPlants(similarPlantsData);
+      moreLikeThisSheetRef.current?.present();
+    } catch (error) {
+      console.error('Error fetching similar plants:', error);
+      console.error('Response:', error.response?.text ? error.response.text() : 'No response text available');
+    } finally {
+      setIsLoading(false);
+    }
+    
   };
 
   if (isLoading) {
@@ -159,7 +186,18 @@ const Biodex = () => {
           index={0}
         >
           <View>
-            <Text>More plants!</Text>
+            <Text>More plants like {currentPlant.name}</Text>
+            <FlatList
+              data={similarPlants}
+              renderItem={({ item }) => (
+                <View>
+                  <Image source={{ uri: item.image }}/>
+                  <Text>{item.name}</Text>
+                  <Text>{item.description}</Text>
+                </View>
+              )}
+              keyExtractor={(item, index) => index.toString()}
+            />
           </View>
         </BottomSheetModal>
 
