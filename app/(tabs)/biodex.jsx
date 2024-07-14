@@ -95,6 +95,7 @@ const Biodex = () => {
         "Name 3 plants similar to ${currentPlant.name} and include an image and a short description for each JSON format."
       );
       const similarPlantsData = JSON.parse(result.response.text());
+      console.log(similarPlantsData);
       setSimilarPlants(similarPlantsData);
       moreLikeThisSheetRef.current?.present();
     } catch (error) {
@@ -182,10 +183,10 @@ const Biodex = () => {
 
         <BottomSheetModal
           ref={moreLikeThisSheetRef}
-          snapPoints={(['90%'])}
+          snapPoints={['90%']}
           index={0}
         >
-          <View>
+          {/* <View>
             <Text>More plants like {currentPlant.name}</Text>
             <FlatList
               data={similarPlants}
@@ -198,7 +199,7 @@ const Biodex = () => {
               )}
               keyExtractor={(item, index) => index.toString()}
             />
-          </View>
+          </View> */}
         </BottomSheetModal>
 
       </BottomSheetModalProvider>
@@ -248,7 +249,9 @@ const styles = StyleSheet.create({
     fontSize: 15,
     padding: 5,
     justifyContent: 'center',
-    color: '#397004'
+    alignSelf: 'center',
+    color: '#397004',
+    fontWeight: 'bold'
   },
   textContainer: {
     justifyContent: 'center',
