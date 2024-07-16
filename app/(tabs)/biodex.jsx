@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, FlatList, SafeAreaView, Image, TouchableOpacity, ActivityIndicator, RefreshControl, ScrollView, Pressable} from 'react-native'
+import { Link, router } from "expo-router";
 import React, { useState, useEffect, useRef } from 'react'
 import { getAuth } from 'firebase/auth';
 import { db } from '../../FirebaseConfig'
@@ -95,8 +96,9 @@ const Biodex = () => {
         "Name 3 plants similar to ${currentPlant.name} and include an image and a short description for each JSON format."
       );
       const similarPlantsData = JSON.parse(result.response.text());
-      console.log(similarPlantsData);
-      setSimilarPlants(similarPlantsData);
+      console.log(similarPlantsData.plants);
+      setSimilarPlants(similarPlantsData.plants);
+      //console.log(similarPlants);
       moreLikeThisSheetRef.current?.present();
     } catch (error) {
       console.error('Error fetching similar plants:', error);
@@ -107,14 +109,14 @@ const Biodex = () => {
     
   };
 
-  if (isLoading) {
-    return (
-      <SafeAreaView style={styles.loadingContainer}>
-        <ActivityIndicator size="large"/>
-        <Text>Loading</Text>
-      </SafeAreaView>
-    )
-  }
+  // if (isLoading) {
+  //   return (
+  //     <SafeAreaView style={styles.loadingContainer}>
+  //       <ActivityIndicator size="large"/>
+  //       <Text>Loading</Text>
+  //     </SafeAreaView>
+  //   )
+  // }
 
   return (
     <GestureHandlerRootView>
@@ -155,7 +157,10 @@ const Biodex = () => {
         >
           <View style={styles.bottomSheetContainer}>
 
-            <TouchableOpacity onPress={moreLikeThis}>
+          { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
+        ) : (
+          <>
+          <Pressable onPress={moreLikeThis} >
               <View style={styles.buttonContainer}>
                 <Ionicons
                   name={"information-circle-outline"}
@@ -164,7 +169,11 @@ const Biodex = () => {
                 />
                 <Text style={styles.buttonText}>More like this</Text>
               </View>
-            </TouchableOpacity>
+            </Pressable>
+
+          </>
+        )
+      }
 
             <TouchableOpacity onPress={removePlant}>
               <View style={styles.buttonContainer}>
@@ -186,20 +195,23 @@ const Biodex = () => {
           snapPoints={['90%']}
           index={0}
         >
-          {/* <View>
-            <Text>More plants like {currentPlant.name}</Text>
+          <View>
+            <Text style={styles.morePlantsTitle}>More plants like {currentPlant.name}</Text>
             <FlatList
               data={similarPlants}
-              renderItem={({ item }) => (
-                <View>
-                  <Image source={{ uri: item.image }}/>
-                  <Text>{item.name}</Text>
-                  <Text>{item.description}</Text>
+              renderItem={({ item }) => {
+                return (
+                  <View style={styles.card}>
+                    <Image source={{ uri: item.imageUrl }} style={styles.image}/>
+                    <Text style={styles.morePlantsTitle}>{item.name}</Text>
+                    <Text style={styles.morePlantsText}>{item.description}</Text>
                 </View>
-              )}
+                );
+              }}
+            
               keyExtractor={(item, index) => index.toString()}
             />
-          </View> */}
+          </View>
         </BottomSheetModal>
 
       </BottomSheetModalProvider>
@@ -290,5 +302,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 65,
     left: 350
+  },
+  morePlantsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    color: "#397004",
+    marginBottom: 5
+  },
+  morePlantsText: {
+    color: "#397004",
+    alignSelf: 'center',
+    fontSize: 14
   }
 });
