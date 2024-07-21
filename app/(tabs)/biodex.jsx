@@ -68,17 +68,13 @@ const Biodex = () => {
     setIsLoading(true)
     try {
       const docRef = doc(db, "plants", user.uid)
-      const plantToRemove = {
-        name: plant.name,
-        image: plant.image
-      };  
       await updateDoc(docRef, {
-        plants: arrayRemove(plantToRemove)
+        plants: arrayRemove(plant)
       })
       console.log("plant deleted")
-      setPlants((currentPlant) => currentPlant.filter((p) => p.name !== plant.name && p.image !== plant.image))
+      setPlants((currentPlant) => currentPlant.filter((p) => p !== pin))
     } catch (error) {
-      console.error('Error deleting plant:', error)
+      console.error('Error deleting pin:', error)
     } finally {
       setIsLoading(false)
     }
@@ -97,7 +93,7 @@ const Biodex = () => {
         ],
       });
       const result = await chatSession.sendMessage(
-        "Name 3 plants similar to ${currentPlant.name} and include the common name, scientific name, and a short description for each JSON format."
+        "Name 3 plants similar to ${currentPlant.name} and include an image and a short description for each JSON format."
       );
       const similarPlantsData = JSON.parse(result.response.text());
       console.log(similarPlantsData.plants);
@@ -206,8 +202,8 @@ const Biodex = () => {
               renderItem={({ item }) => {
                 return (
                   <View style={styles.card}>
-                    <Text style={styles.morePlantsTitle}>{item.common_name}</Text>
-                    <Text style={styles.morePlantsSubtitle}>{item.scientific_name}</Text>
+                    <Image source={{ uri: item.imageUrl }} style={styles.image}/>
+                    <Text style={styles.morePlantsTitle}>{item.name}</Text>
                     <Text style={styles.morePlantsText}>{item.description}</Text>
                 </View>
                 );
@@ -314,17 +310,9 @@ const styles = StyleSheet.create({
     color: "#397004",
     marginBottom: 5
   },
-  morePlantsSubtitle: {
-    fontSize: 15,
-    alignSelf: 'center',
-    color: "#397004",
-    marginBottom: 10
-  },
   morePlantsText: {
     color: "#397004",
     alignSelf: 'center',
-    fontSize: 14,
-    textAlign: 'justify',
-    textJustify: 'interWord',
+    fontSize: 14
   }
 });

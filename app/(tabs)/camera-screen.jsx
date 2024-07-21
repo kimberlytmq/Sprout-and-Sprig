@@ -115,7 +115,6 @@ const CameraScreen = () => {
           plants: arrayUnion(plant)
         });
         console.log("plant added")
-        Alert.alert("Plant added to Biodex");
       } catch (error) {
         console.error('Error saving plant:', error)
       } finally {
