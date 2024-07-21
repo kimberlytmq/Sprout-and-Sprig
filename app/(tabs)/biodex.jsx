@@ -37,6 +37,21 @@ const Biodex = () => {
   };
 
   //get plant data from Firebase
+  const fetchPlants = async () => {
+    try {
+      const docRef = doc(db, "plants", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setPlants(docSnap.data().plants || []);
+      } else {
+        console.log("No such document");
+      }
+    } catch (error) {
+      console.error('Error fetching plants: ', error)
+    }
+  };
+
+  /*
   const fetchImages = async () => {
     const docRef = doc(db, "plants", user.uid);
     const docSnap = await getDoc(docRef);
@@ -46,15 +61,16 @@ const Biodex = () => {
       console.log("No such document");
     }
   };
+  */
 
   const handleRefresh = () => {
     setRefreshing(true);
-    fetchImages();
+    fetchPlants();
     setRefreshing(false);
   }
   
   useEffect(() => {   
-    fetchImages();
+    fetchPlants();
   }, []);
 
   const openBottomSheet = (plant) => {
@@ -72,9 +88,9 @@ const Biodex = () => {
         plants: arrayRemove(plant)
       })
       console.log("plant deleted")
-      setPlants((currentPlant) => currentPlant.filter((p) => p !== pin))
+      setPlants((currentPlant) => currentPlant.filter((p) => p !== plant))
     } catch (error) {
-      console.error('Error deleting pin:', error)
+      console.error('Error deleting plant:', error)
     } finally {
       setIsLoading(false)
     }
@@ -93,7 +109,7 @@ const Biodex = () => {
         ],
       });
       const result = await chatSession.sendMessage(
-        "Name 3 plants similar to ${currentPlant.name} and include an image and a short description for each JSON format."
+        "Name 3 plants similar to ${currentPlant.name} and include the common name, scientific name and description for each in JSON format."
       );
       const similarPlantsData = JSON.parse(result.response.text());
       console.log(similarPlantsData.plants);
@@ -192,7 +208,7 @@ const Biodex = () => {
 
         <BottomSheetModal
           ref={moreLikeThisSheetRef}
-          snapPoints={['90%']}
+          snapPoints={['80%']}
           index={0}
         >
           <View>
@@ -202,8 +218,8 @@ const Biodex = () => {
               renderItem={({ item }) => {
                 return (
                   <View style={styles.card}>
-                    <Image source={{ uri: item.imageUrl }} style={styles.image}/>
-                    <Text style={styles.morePlantsTitle}>{item.name}</Text>
+                    <Text style={styles.morePlantsTitle}>{item.common_name}</Text>
+                    <Text style={styles.morePlantsSubtitle}>{item.scientific_name}</Text>
                     <Text style={styles.morePlantsText}>{item.description}</Text>
                 </View>
                 );
@@ -310,9 +326,17 @@ const styles = StyleSheet.create({
     color: "#397004",
     marginBottom: 5
   },
+  morePlantsSubtitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    alignSelf: 'center',
+    color: "#397004",
+    marginBottom: 5
+  },
   morePlantsText: {
     color: "#397004",
     alignSelf: 'center',
-    fontSize: 14
+    fontSize: 14,
+    textAlign: 'justify'
   }
 });
