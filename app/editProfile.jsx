@@ -147,24 +147,11 @@ async function uploadImage(uri, fileType) {
 
 async function saveChanges(url, newUsername) {
   try {
-    //await uploadImage(url, "image");
     setUploading(true);
     const userDoc = doc(db, 'users', user.uid)
-    // if (newEmail != user.email) {
-    //   updateEmail(newEmail);
-    //   console.log("email updated");
-    // }
-
-    // if (newPassword != user.password) {
-    //   updatePassword(newPassword);
-    //   console.log("password updated");
-    // }
-
     const docRef = await updateDoc(userDoc, {
       profilePicture: url,
       username: newUsername,
-      // email: newEmail,
-      // password: newPassword
     });
     setUploading(false);
     console.log("changes saved correctly");
@@ -215,27 +202,10 @@ async function saveChanges(url, newUsername) {
           editable={true}
           style={styles.input}
           />
-
-        {/* <Text style={styles.text}>Email</Text>
-        <TextInput 
-          value={email}
-          onChangeText={value => setEmail(value)}
-          editable={true}
-          style={styles.input}
-          />
-
-        <Text style={styles.text}>Password</Text>
-        <TextInput 
-          value={password}
-          onChangeText={value => setPassword(value)}
-          editable={true}
-          style={styles.input}
-          secureTextEntry
-          /> */}
           
       </View>
 
-      { uploading ? (<ActivityIndicator size="large" color="#0000ff"/> 
+      { uploading ? (<ActivityIndicator size="large" color="#397004"/> 
         ) : (
           <>
              <TouchableOpacity 

@@ -108,14 +108,17 @@ const Biodex = () => {
         history: [
         ],
       });
+      console.log(currentPlant.name);
       const result = await chatSession.sendMessage(
-        "Name 3 plants similar to ${currentPlant.name} and include the common name, scientific name and description for each in JSON format."
+        `Name 3 plants similar to ${currentPlant.name} and include the common name, scientific name and description for each in JSON format.`
       );
+      
       const similarPlantsData = JSON.parse(result.response.text());
       console.log(similarPlantsData.plants);
       setSimilarPlants(similarPlantsData.plants);
-      //console.log(similarPlants);
       moreLikeThisSheetRef.current?.present();
+      //console.log(similarPlants);
+
     } catch (error) {
       console.error('Error fetching similar plants:', error);
       console.error('Response:', error.response?.text ? error.response.text() : 'No response text available');
@@ -171,38 +174,38 @@ const Biodex = () => {
           snapPoints={snapPoints}
           index={0}
         >
-          <View style={styles.bottomSheetContainer}>
 
-          { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
-        ) : (
-          <>
-          <Pressable onPress={moreLikeThis} >
-              <View style={styles.buttonContainer}>
-                <Ionicons
-                  name={"information-circle-outline"}
-                  color={"#397004"}
-                  size={26}
-                />
-                <Text style={styles.buttonText}>More like this</Text>
+        { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
+            ) : (
+              <>
+              <View style={styles.bottomSheetContainer}>
+                <Pressable onPress={moreLikeThis} >
+                  <View style={styles.buttonContainer}>
+                    <Ionicons
+                      name={"information-circle-outline"}
+                      color={"#397004"}
+                      size={26}
+                    />
+                    <Text style={styles.buttonText}>More like this</Text>
+                  </View>
+                </Pressable>
+
+                <TouchableOpacity onPress={() => removePlant(currentPlant)}>
+                  <View style={styles.buttonContainer}>
+                    <Ionicons
+                      name={"trash-outline"}
+                      color={"#397004"}
+                      size={26}
+                    />
+                    <Text style={styles.buttonText}>Remove plant</Text>
+                  </View>
+                </TouchableOpacity>
+
               </View>
-            </Pressable>
-
-          </>
-        )
-      }
-
-            <TouchableOpacity onPress={removePlant}>
-              <View style={styles.buttonContainer}>
-                <Ionicons
-                  name={"trash-outline"}
-                  color={"#397004"}
-                  size={26}
-                />
-                <Text style={styles.buttonText}>Remove plant</Text>
-              </View>
-            </TouchableOpacity>
-
-          </View>
+              </>
+            )
+        }
+          
 
         </BottomSheetModal>
 
