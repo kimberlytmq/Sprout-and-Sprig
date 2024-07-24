@@ -51,18 +51,6 @@ const Biodex = () => {
     }
   };
 
-  /*
-  const fetchImages = async () => {
-    const docRef = doc(db, "plants", user.uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      setPlants(docSnap.data().plants || []);
-    } else {
-      console.log("No such document");
-    }
-  };
-  */
-
   const handleRefresh = () => {
     setRefreshing(true);
     fetchPlants();
@@ -92,8 +80,13 @@ const Biodex = () => {
     } catch (error) {
       console.error('Error deleting plant:', error)
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
+      closeBottomSheet();
     }
+  }
+
+  const closeBottomSheet = () => {
+    bottomSheetRef.current?.dismiss();
   }
 
   // AI to generate similar plants
@@ -127,15 +120,6 @@ const Biodex = () => {
     }
     
   };
-
-  // if (isLoading) {
-  //   return (
-  //     <SafeAreaView style={styles.loadingContainer}>
-  //       <ActivityIndicator size="large"/>
-  //       <Text>Loading</Text>
-  //     </SafeAreaView>
-  //   )
-  // }
 
   return (
     <GestureHandlerRootView>
