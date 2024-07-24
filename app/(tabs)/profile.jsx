@@ -12,12 +12,11 @@ import { SimpleLineIcons } from '@expo/vector-icons';
 
 
 const achievementsCriteria = [
-  { id: 1, description: "Saved your first plant pin on the map", check: (pins, plants) => pins.length >= 1},
-  { id: 2, description: "Saved 5 plant pins on the map", check: (pins, plants) => pins.length >= 5},
-  { id: 3, description: "Saved 10 plant pins on the map", check: (pins, plants) => pins.length >= 10},
-  { id: 4, description: "Saved your first plant to the Biodex", check: (pins, plants) => plants.length >= 1},
-  { id: 5, description: "Saved 5 plants to the Biodex", check: (pins, plants) => plants.length >= 5},
-  { id: 6, description: "Saved 10 plants to the Biodex", check: (pins, plants) => plants.length >= 10}
+  { id: 1, description: "Saved 5 plant pins on the map", check: (pins, plants) => pins.length >= 5},
+  { id: 2, description: "Saved 10 plant pins on the map", check: (pins, plants) => pins.length >= 10},
+  { id: 3, description: "Saved your first plant to the Biodex", check: (pins, plants) => plants.length >= 1},
+  { id: 4, description: "Saved 5 plants to the Biodex", check: (pins, plants) => plants.length >= 5},
+  { id: 5, description: "Saved 10 plants to the Biodex", check: (pins, plants) => plants.length >= 10}
 
 ]
 
