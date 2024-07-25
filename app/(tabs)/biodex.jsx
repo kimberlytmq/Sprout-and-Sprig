@@ -101,7 +101,6 @@ const Biodex = () => {
         history: [
         ],
       });
-      console.log(currentPlant.name);
       const result = await chatSession.sendMessage(
         `Name 3 plants similar to ${currentPlant.name} and include the common name, scientific name and description for each in JSON format.`
       );
@@ -117,6 +116,7 @@ const Biodex = () => {
       console.error('Response:', error.response?.text ? error.response.text() : 'No response text available');
     } finally {
       setIsLoading(false);
+      closeBottomSheet();
     }
     
   };

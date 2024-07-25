@@ -170,8 +170,13 @@ const CameraScreen = () => {
   };
 
   const openBottomSheet = (data) => {
-    setIdentifiedPlant(data.suggestions[0]);
+    if (data.is_plant) {
+      setIdentifiedPlant(data.suggestions[0]);
+    } else {
+      setIdentifiedPlant('');
+    }
     bottomSheetRef.current?.present();
+    //console.log(identifiedPlant);
     //console.log(plantData);
   }
 
@@ -231,6 +236,7 @@ const CameraScreen = () => {
         >
 
           {plantData && 
+          identifiedPlant ?
             <ScrollView contentContainerStyle={styles.bottomSheetContainer}>
             <Image 
               source={{ uri: identifiedPlant.plant_details?.wiki_image
@@ -240,19 +246,23 @@ const CameraScreen = () => {
             />
             <Text style={styles.plantNameText}>{identifiedPlant.plant_details?.common_names[0]}</Text>
             <Text style={styles.plantDetailsText}>Scientific name: {identifiedPlant.plant_name}</Text>
-            <Text style={styles.plantDetailsText}>{identifiedPlant.plant_details?.wiki_description.value}</Text>
+            <Text style={styles.plantDetailsText}>{identifiedPlant.plant_details?.wiki_description?.value}</Text>
 
             { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
               ) : (
                 <>
                 <TouchableOpacity style={styles.button} onPress={addPlant}>
-                    <Text style={styles.buttonText}>Add image to Biodex</Text>
+                    <Text style={styles.buttonText}>Add plant to Biodex</Text>
                   </TouchableOpacity>  
                 </>
               )
             }
 
           </ScrollView>
+          :
+          <View style={styles.bottomSheetContainer}>
+            <Text style={styles.errorText}>No results found. Please try again</Text>
+          </View>
           }
 
         </BottomSheetModal>
@@ -344,4 +354,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     marginRight: 10
   },
+  errorText: {
+    fontSize: 20,
+    color: '#145A32',
+    fontWeight: 'bold',
+    marginTop: 300
+  }
 })

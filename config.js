@@ -1,1 +1,1 @@
-export const PLANT_API_KEY = 'x31Pa6LiYh7CCre9XuqeGj8fG7aEx6qeur2ju2nb4fCjSfxS4T';
+export const PLANT_API_KEY = '6bohSO7iRflqd9k9n6TnrT1ruyxAxreWW0NdSPz3BpYHIZ8eI5';
