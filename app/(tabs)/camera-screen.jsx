@@ -73,12 +73,14 @@ const CameraScreen = () => {
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
+      base64: true
     });
 
     console.log(result);
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+      setImageBase(result.assets[0].base64);
     }
   }
 
@@ -139,6 +141,7 @@ const CameraScreen = () => {
   }
 
   const identifyPlant = async () => {
+    console.log(imageBase);
     const data = {
       images: ["data:image/jpeg;base64," + imageBase],
       modifiers: ["crops_fast", "similar_images"],
