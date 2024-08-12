@@ -6,7 +6,7 @@ import { db } from '../../FirebaseConfig'
 import { doc, updateDoc, arrayUnion, addDoc } from 'firebase/firestore';
 import { PLANT_API_KEY } from '../../config';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModal, BottomSheetModalProvider } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, BottomSheetModalProvider, BottomSheetScrollView, BottomSheetView } from '@gorhom/bottom-sheet';
 
 
 const CameraScreen = () => {
@@ -196,7 +196,7 @@ const CameraScreen = () => {
   return (
     <GestureHandlerRootView>
       <BottomSheetModalProvider>
-        <View style={styles.container}>
+        <SafeAreaView style={styles.container}>
         <Text style={styles.title}>Plant Identifier</Text>
         <Text style={styles.subtitle}>
           Upload a photo of a plant and let us identify it!
@@ -228,10 +228,7 @@ const CameraScreen = () => {
         </View>
         }
 
-        <View>
-
-        </View>
-
+        <SafeAreaView>
         <BottomSheetModal
           ref={bottomSheetRef} 
           snapPoints={snapPoints}
@@ -240,28 +237,32 @@ const CameraScreen = () => {
 
           {plantData && 
           identifiedPlant ?
-            <ScrollView contentContainerStyle={styles.bottomSheetContainer}>
-            <Image 
-              source={{ uri: identifiedPlant.plant_details?.wiki_image
-                        ? identifiedPlant.plant_details.wiki_image.value
-                        : plantData.images[0].url }}
-              style={styles.plantImage}
-            />
-            <Text style={styles.plantNameText}>{identifiedPlant.plant_details?.common_names[0]}</Text>
-            <Text style={styles.plantDetailsText}>Scientific name: {identifiedPlant.plant_name}</Text>
-            <Text style={styles.plantDetailsText}>{identifiedPlant.plant_details?.wiki_description?.value}</Text>
+            <BottomSheetScrollView contentContainerStyle={styles.scrollContainer}>
+              <View style={styles.bottomSheetContainer}>
+                <Image 
+                source={{ uri: identifiedPlant.plant_details?.wiki_image
+                          ? identifiedPlant.plant_details.wiki_image.value
+                          : plantData.images[0].url }}
+                style={styles.plantImage}
+              />
+              <Text style={styles.plantNameText}>{identifiedPlant.plant_details?.common_names[0]}</Text>
+              <Text style={styles.plantDetailsText}>Scientific name: {identifiedPlant.plant_name}</Text>
+              <Text style={styles.plantDetailsText}>{identifiedPlant.plant_details?.wiki_description?.value}</Text>
 
-            { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
-              ) : (
-                <>
-                <TouchableOpacity style={styles.button} onPress={addPlant}>
-                    <Text style={styles.buttonText}>Add plant to Biodex</Text>
-                  </TouchableOpacity>  
-                </>
-              )
-            }
+              { isLoading ? (<ActivityIndicator size="large" color="#397004"/> 
+                ) : (
+                  <>
+                  <TouchableOpacity style={styles.button} onPress={addPlant}>
+                      <Text style={styles.buttonText}>Add plant to Biodex</Text>
+                    </TouchableOpacity>  
+                  </>
+                )
+              }
 
-          </ScrollView>
+              </View>
+            
+
+          </BottomSheetScrollView>
           :
           <View style={styles.bottomSheetContainer}>
             <Text style={styles.errorText}>No results found. Please try again</Text>
@@ -269,8 +270,12 @@ const CameraScreen = () => {
           }
 
         </BottomSheetModal>
+
+        </SafeAreaView>
+
+       
         
-      </View>
+      </SafeAreaView>
 
       </BottomSheetModalProvider>
     </GestureHandlerRootView>
@@ -333,6 +338,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E9F7EF",
     flex: 1,
     alignItems: 'center',
+    marginBottom: 100
   },
   plantImage: {
     width: 250,
@@ -362,5 +368,9 @@ const styles = StyleSheet.create({
     color: '#145A32',
     fontWeight: 'bold',
     marginTop: 300
+  },
+  scrollContainer: {
+    backgroundColor: '#E9F7EF',
+    paddingVertical: 10
   }
 })
